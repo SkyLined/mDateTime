@@ -88,7 +88,7 @@ class cDate(object):
   def foNow(cClass):
     return cClass.foFromPyDate(datetime.datetime.now());
   @classmethod
-  def foUTCNow(cClass):
+  def foNowUTC(cClass):
     return cClass.foFromPyDate(datetime.datetime.utcnow());
   #methods
   def foClone(oSelf):
@@ -175,7 +175,7 @@ class cDate(object):
   
   def fbIsInThePast(oSelf):
     return oSelf.fbIsBefore(oSelf.foNow());
-  def fbIsInThePast(oSelf):
+  def fbIsInThePastUTC(oSelf):
     return oSelf.fbIsBefore(oSelf.foNowUTC());
   def fbIsToday(oSelf):
     return oSelf.fbIsEqualTo(oSelf.foNow());

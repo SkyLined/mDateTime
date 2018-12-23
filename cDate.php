@@ -67,18 +67,18 @@
     function __set($sPropertyName, $xValue) {
       if ($sPropertyName == "uYear") {
         if (!fbIsValidYear($xValue)) throw new Exception("Invalid year " . json_encode($xValue) . ".");
-        if (!fbIsValidDate($xValue, $this->uMonth, $this->uDay))
-            throw new Exception("Invalid year in date " . fsGetDataString($xValue, $this->uMonth, $this->uDay) . ".");
+        if (!fbIsValidDate($xValue, $this->__uMonth, $this->__uDay))
+            throw new Exception("Invalid year in date " . fsGetDataString($xValue, $this->__uMonth, $this->__uDay) . ".");
         $this->__uYear = $xValue;
       } else if ($sPropertyName == "uMonth") {
         if (!fbIsValidMonth($xValue)) throw new Exception("Invalid month " . json_encode($xValue) . ".");
-        if (!fbIsValidDate($this->uYear, $xValue, $this->uDay))
-            throw new Exception("Invalid month in date " . fsGetDataString($this->uYear, $xValue, $this->uDay) . ".");
+        if (!fbIsValidDate($this->__uYear, $xValue, $this->__uDay))
+            throw new Exception("Invalid month in date " . fsGetDataString($this->__uYear, $xValue, $this->__uDay) . ".");
         $this->__uMonth = $xValue;
       } else if ($sPropertyName == "uDay") {
         if (!fbIsValidDay($xValue)) throw new Exception("Invalid day " . json_encode($xValue) . ".");
-        if (!fbIsValidDate($this->uYear, $this->uMonth, $xValue))
-            throw new Exception("Invalid day in date " . fsGetDataString($this->uYear, $this->uMonth, $xValue) . ".");
+        if (!fbIsValidDate($this->__uYear, $this->__uMonth, $xValue))
+            throw new Exception("Invalid day in date " . fsGetDataString($this->__uYear, $this->__uMonth, $xValue) . ".");
         $this->__uDay = $xValue;
       };
     }
@@ -134,7 +134,7 @@
     # methods
     public function foClone() {
       $cClass = get_class($this);
-      return new $cClass($this->uYear, $this->uMonth, $this->uDay);
+      return new $cClass($this->__uYear, $this->__uMonth, $this->__uDay);
     }
     
     public function fSet($uYear, $uMonth, $uDay) {
@@ -221,9 +221,9 @@
     public function fsToHumanReadableString() {
       // Month <day>th, <year>
       return (
-        cDate_asMonths[$this->uMonth - 1]
-        . " " . (string)$this->uDay . cDate_asOrdinalPostfixes[$this->uDay % 10]
-        . ", " . (string)$this->uYear
+        cDate_asMonths[$this->__uMonth - 1]
+        . " " . (string)$this->__uDay . cDate_asOrdinalPostfixes[$this->__uDay % 10]
+        . ", " . (string)$this->__uYear
       );
     }
     public function foToPHPDateTime() {
@@ -243,9 +243,9 @@
     }
     public function fsToString() {
       return (
-        str_pad($this->uYear, 4, "0", STR_PAD_LEFT)
-        . "-" . str_pad($this->uMonth, 2, "0", STR_PAD_LEFT)
-        . "-" . str_pad($this->uDay, 2, "0", STR_PAD_LEFT)
+        str_pad($this->__uYear, 4, "0", STR_PAD_LEFT)
+        . "-" . str_pad($this->__uMonth, 2, "0", STR_PAD_LEFT)
+        . "-" . str_pad($this->__uDay, 2, "0", STR_PAD_LEFT)
       );
     }
     public function __toString() {

@@ -42,7 +42,7 @@ class cDate(object):
   @uYear.setter
   def uYear(oSelf, uYear):
     if not fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
-    if not fbIsValidDate(uYear, oSelf.uMonth, oSelf.uDay): raise ValueError("Invalid year in date %s." % fsGetDateString(uYear, oSelf.uMonth, oSelf.uDay));
+    if not fbIsValidDate(uYear, oSelf.__uMonth, oSelf.__uDay): raise ValueError("Invalid year in date %s." % fsGetDateString(uYear, oSelf.__uMonth, oSelf.__uDay));
     oSelf.__uYear = uYear;
   @property
   def uMonth(oSelf):
@@ -50,7 +50,7 @@ class cDate(object):
   @uMonth.setter
   def uMonth(oSelf, uMonth):
     if not fbIsValidMonth(uMonth): raise ValueError("Invalid month " + repr(uMonth) + ".");
-    if not fbIsValidDate(oSelf.uYear, uMonth, oSelf.uDay): raise ValueError("Invalid month in date %s." % fsGetDateString(oSelf.uYear, uMonth, oSelf.uDay));
+    if not fbIsValidDate(oSelf.__uYear, uMonth, oSelf.__uDay): raise ValueError("Invalid month in date %s." % fsGetDateString(oSelf.__uYear, uMonth, oSelf.__uDay));
     oSelf.__uMonth = uMonth;
   @property
   def uDay(oSelf):
@@ -58,7 +58,7 @@ class cDate(object):
   @uDay.setter
   def uDay(oSelf, uDay):
     if not fbIsValidDay(uDay): raise ValueError("Invalid day " + repr(uDay) + ".");
-    if not fbIsValidDate(oSelf.uYear, oSelf.uMonth, uDay): raise ValueError("Invalid day in date %s." % fsGetDateString(uYear, uMonth, uDay));
+    if not fbIsValidDate(oSelf.__uYear, oSelf.__uMonth, uDay): raise ValueError("Invalid day in date %s." % fsGetDateString(uYear, uMonth, uDay));
     oSelf.__uDay = uDay;
   #static
   @classmethod
@@ -92,7 +92,7 @@ class cDate(object):
     return cClass.foFromPyDate(datetime.datetime.utcnow());
   #methods
   def foClone(oSelf):
-    return oSelf.__class__(oSelf.uYear, oSelf.uMonth, oSelf.uDay);
+    return oSelf.__class__(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   
   def fSet(oSelf, uYear, uMonth, uDay):
     if not fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
@@ -106,15 +106,15 @@ class cDate(object):
   def foGetEndDateForDuration(oSelf, oDuration):
     # Note that this code ignores the time (if any) in oDuration
     # Add the year and month:
-    uNewYear = oSelf.uYear + oDuration.iYears;
-    uNewMonth0Based = oSelf.uMonth - 1 + oDuration.iMonths;
+    uNewYear = oSelf.__uYear + oDuration.iYears;
+    uNewMonth0Based = oSelf.__uMonth - 1 + oDuration.iMonths;
     # If uNewMonth < 0 or > 11, convert the excess to years and add it.
     uNewYear += long(uNewMonth0Based / 12);
     uNewMonth0Based = ((uNewMonth0Based % 12) + (12 if uNewMonth0Based < 0 else 0)) % 12;
     # Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
     # converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
     oEndDate = oSelf.foFromPyDate(
-      datetime.date(uNewYear, (uNewMonth0Based + 1), oSelf.uDay)
+      datetime.date(uNewYear, (uNewMonth0Based + 1), oSelf.__uDay)
       + datetime.timedelta(oDuration.iDays)
     );
     return oEndDate;
@@ -189,15 +189,15 @@ class cDate(object):
   def fsToHumanReadableString(oSelf):
     # Month <day>th, <year>
     return "%s %d%s, %d" % (
-      asMonths[oSelf.uMonth - 1],
-      oSelf.uDay, asOrdinalPostfixes[oSelf.uDay % 10],
-      oSelf.uYear,
+      asMonths[oSelf.__uMonth - 1],
+      oSelf.__uDay, asOrdinalPostfixes[oSelf.__uDay % 10],
+      oSelf.__uYear,
     );
   def foToPyDate(oSelf):
-    return datetime.date(oSelf.uYear, oSelf.uMonth, oSelf.uDay);
+    return datetime.date(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   def fxToJSON(oSelf):
     return str(oSelf);
   def fsToString(oSelf):
-    return fsGetDateString(oSelf.uYear, oSelf.uMonth, oSelf.uDay);
+    return fsGetDateString(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   def __str__(oSelf):
     return oSelf.fsToString();

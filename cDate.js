@@ -49,7 +49,7 @@ const cDate = (function() {
     "get": function() { return this.__uYear; },
     "set": function(uYear) {
       if (!fbIsValidYear(uYear)) throw new Error("Invalid year " + JSON.stringify(uYear) + ".");
-      if (!fbIsValidDate(uYear, this.uMonth, this.uDay)) throw new Error("Invalid year in date " + fsGetDateString(uYear, this.uMonth, this.uDay) + ".");
+      if (!fbIsValidDate(uYear, this.__uMonth, this.__uDay)) throw new Error("Invalid year in date " + fsGetDateString(uYear, this.__uMonth, this.__uDay) + ".");
       this.__uYear = uYear;
     },
   });
@@ -57,7 +57,7 @@ const cDate = (function() {
     "get": function() { return this.__uMonth; },
     "set": function(uMonth) {
       if (!fbIsValidMonth(uMonth)) throw new Error("Invalid month " + JSON.stringify(uMonth) + ".");
-      if (!fbIsValidDate(this.uYear, uMonth, this.uDay)) throw new Error("Invalid month in date " + fsGetDateString(this.uYear, uMonth, this.uDay) + ".");
+      if (!fbIsValidDate(this.__uYear, uMonth, this.__uDay)) throw new Error("Invalid month in date " + fsGetDateString(this.__uYear, uMonth, this.__uDay) + ".");
       this.__uMonth = uMonth;
     },
   });
@@ -65,7 +65,7 @@ const cDate = (function() {
     "get": function() { return this.__uDay; },
     "set": function(uDay) {
       if (!fbIsValidDay(uDay)) throw new Error("Invalid day " + JSON.stringify(uDay) + ".");
-      if (!fbIsValidDate(this.uYear, this.uMonth, uDay)) throw new Error("Invalid day in date " + fsGetDateString(this.uYear, this.uMonth, uDay) + ".");
+      if (!fbIsValidDate(this.__uYear, this.__uMonth, uDay)) throw new Error("Invalid day in date " + fsGetDateString(this.__uYear, this.__uMonth, uDay) + ".");
       this.__uDay = uDay;
     },
   });
@@ -103,7 +103,7 @@ const cDate = (function() {
   };
   // methods
   cDate.prototype.foClone = function cDate_foClone() {
-    return new this.constructor(this.uYear, this.uMonth, this.uDay);
+    return new this.constructor(this.__uYear, this.__uMonth, this.__uDay);
   };
   cDate.prototype.fSet = function cDate_fSet(uYear, uMonth, uDay) {
     if (uYear === undefined || uYear === null) uYear = this.__uYear;
@@ -112,7 +112,7 @@ const cDate = (function() {
     else if (!fbIsValidMonth(uMonth)) throw new Error("Invalid month " + JSON.stringify(uMonth) + ".");
     if (uDay === undefined || uDay === null) uDay = this.__uDay;
     else if (!fbIsValidDay(uDay)) throw new Error("Invalid day " + JSON.stringify(uDay) + ".");
-    if (!fbIsValidDate(uYear, this.uMonth, this.uDay)) throw new Error("Invalid date " + fsGetDateString(uYear, this.uMonth, this.uDay) + ".");
+    if (!fbIsValidDate(uYear, this.__uMonth, this.__uDay)) throw new Error("Invalid date " + fsGetDateString(uYear, this.__uMonth, this.__uDay) + ".");
     this.__uYear = uYear;
     this.__uMonth = uMonth;
     this.__uDay = uDay;
@@ -120,8 +120,8 @@ const cDate = (function() {
   cDate.prototype.foGetEndDateForDuration = function cDate_foEndDateForDuration(oDuration) {
     // Note that this code ignores the time (if any) in oDuration
     // Add the year and month:
-    let uNewYear = this.uYear + oDuration.iYears,
-        uNewMonth0Based = this.uMonth - 1 + oDuration.iMonths;
+    let uNewYear = this.__uYear + oDuration.iYears,
+        uNewMonth0Based = this.__uMonth - 1 + oDuration.iMonths;
     // If uNewMonth < 0 or > 11, convert the excess to years and add it.
     uNewYear += Math.floor(uNewMonth0Based / 12);
     uNewMonth0Based = ((uNewMonth0Based % 12) + (uNewMonth0Based < 0 ? 12 : 0)) % 12;
@@ -131,7 +131,7 @@ const cDate = (function() {
     // a cDate. This allows us to reuse the JavaScript API for tracking the number of days in each month.
     const oEndJSDateWithoutDays = new Date(uNewYear + "-" + (uNewMonth0Based + 1) + "-01"),
           oEndJSDate = new Date(
-            oEndJSDateWithoutDays.valueOf() + (this.uDay - 1 + oDuration.iDays) * 24 * 60 * 60 * 1000
+            oEndJSDateWithoutDays.valueOf() + (this.__uDay - 1 + oDuration.iDays) * 24 * 60 * 60 * 1000
           );
     return cDate.foFromJSDate(oEndJSDate);
   };
@@ -218,9 +218,9 @@ const cDate = (function() {
   cDate.prototype.fsToHumanReadableString = function cDate_fsToHumanReadableString() {
     // Month <day>th, <year>
     return (
-      asMonths[this.uMonth - 1]
-      + " " + this.uDay.toString() + asOrdinalPostfixes[this.uDay % 10]
-      + ", " + this.uYear.toString()
+      asMonths[this.__uMonth - 1]
+      + " " + this.__uDay.toString() + asOrdinalPostfixes[this.__uDay % 10]
+      + ", " + this.__uYear.toString()
     );
   };
   cDate.prototype.foToJSDate = function cDate_toJSDate() {
@@ -233,7 +233,7 @@ const cDate = (function() {
     return this.fsToString();
   };
   cDate.prototype.fsToString = function cDate_fsToString() {
-    return fsGetDateString(this.uYear, this.uMonth, this.uDay);
+    return fsGetDateString(this.__uYear, this.__uMonth, this.__uDay);
   };
   cDate.prototype.toString = function cDate_toString() {
     return this.fsToString();

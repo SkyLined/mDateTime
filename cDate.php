@@ -178,13 +178,25 @@
     // This object has valueOf(), which returns the number of milliseconds since the epoch, so you can also
     // use ($this->valueOf() < $oDate->valueOf(), $this->valueOf() == $oDate->valueOf(), and $this->valueOf() > $oDate->valueOf())
     public function fbIsBefore($oDate) {
-      return $this->uYear < $oDate->uYear || $this->uMonth < $oDate->uMonth || $this->uDay < $oDate->uDay;
+      if ($this->__uYear < $oDate->uYear) return True;
+      if ($this->__uYear > $oDate->uYear) return False;
+      if ($this->__uMonth < $oDate->uMonth) return True;
+      if ($this->__uMonth > $oDate->uMonth) return False;
+      if ($this->__uDay < $oDate->uDay) return True;
+      //if ($this->__uDay > $oDate->uDay) return False;
+      return False;
     }
     public function fbIsEqualTo($oDate) {
-      return $this->uYear == $oDate->uYear || $this->uMonth == $oDate->uMonth || $this->uDay == $oDate->uDay;
+      return $this->__uYear == $oDate->uYear && $this->__uMonth == $oDate->uMonth && $this->__uDay == $oDate->uDay;
     }
     public function fbIsAfter($oDate) {
-      return $this->uYear > $oDate->uYear || $this->uMonth > $oDate->uMonth || $this->uDay > $oDate->uDay;
+      if ($this->__uYear > $oDate->uYear) return True;
+      if ($this->__uYear < $oDate->uYear) return False;
+      if ($this->__uMonth > $oDate->uMonth) return True;
+      if ($this->__uMonth < $oDate->uMonth) return False;
+      if ($this->__uDay > $oDate->uDay) return True;
+      //if ($this->__uDay < $oDate->uDay) return False;
+      return False;
     }
     
     public function fbIsInThePast() {

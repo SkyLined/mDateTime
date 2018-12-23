@@ -102,29 +102,46 @@
   };
   if (!$bHasThrownException) throw new Exception((string)$oTestDate . " should not be possible.");
   
+  function fCompareDates($oDate1, $sResults, $oDate2) {
+    if ($sResults == "IsBefore") {
+      if (!$oDate1->fbIsBefore($oDate2)) throw new Exception((string)$oDate1 . " should be before " . (string)$oDate2 . ".");
+    } else {
+      if ($oDate1->fbIsBefore($oDate2)) throw new Exception((string)$oDate1 . " should not be before " . (string)$oDate2 . ".");
+    };
+    if ($sResults == "IsEqualTo") {
+      if (!$oDate1->fbIsEqualTo($oDate2)) throw new Exception((string)$oDate1 . " should be equal to " . (string)$oDate2 . ".");
+    } else {
+      if ($oDate1->fbIsEqualTo($oDate2)) throw new Exception((string)$oDate1 . " should not be equal to " . (string)$oDate2 . ".");
+    };
+    if ($sResults == "IsAfter") {
+      if (!$oDate1->fbIsAfter($oDate2)) throw new Exception((string)$oDate1 . " should be after " . (string)$oDate2 . ".");
+    } else {
+      if ($oDate1->fbIsAfter($oDate2)) throw new Exception((string)$oDate1 . " should not be after " . (string)$oDate2 . ".");
+    };
+  };
   $oDate1 = new cDate(2000, 1, 1);
   $oDate2 = new cDate(2000, 1, 2);
   $oDate3 = new cDate(2000, 2, 1);
   $oDate4 = new cDate(2001, 1, 1);
-  if (!$oDate1->fbIsEqualTo($oDate1)) throw new Exception((string)$oDate1 . " should be equal to itself.");
-  if (!$oDate1->fbIsBefore($oDate2)) throw new Exception((string)$oDate1 . " should be before " . (string)$oDate2 . ".");
-  if (!$oDate1->fbIsBefore($oDate3)) throw new Exception((string)$oDate1 . " should be before " . (string)$oDate3 . ".");
-  if (!$oDate1->fbIsBefore($oDate4)) throw new Exception((string)$oDate1 . " should be before " . (string)$oDate4 . ".");
-  
-  if (!$oDate2->fbIsAfter($oDate1)) throw new Exception((string)$oDate2 . " should be after " . (string)$oDate1 . ".");
-  if (!$oDate2->fbIsEqualTo($oDate2)) throw new Exception((string)$oDate2 . " should be equal to itself.");
-  if (!$oDate2->fbIsBefore($oDate3)) throw new Exception((string)$oDate2 . " should be before " . (string)$oDate3 . ".");
-  if (!$oDate2->fbIsBefore($oDate4)) throw new Exception((string)$oDate2 . " should be before " . (string)$oDate4 . ".");
-  
-  if (!$oDate3->fbIsAfter($oDate1)) throw new Exception((string)$oDate3 . " should be after " . (string)$oDate1 . ".");
-  if (!$oDate3->fbIsAfter($oDate2)) throw new Exception((string)$oDate3 . " should be after " . (string)$oDate2 . ".");
-  if (!$oDate3->fbIsEqualTo($oDate3)) throw new Exception((string)$oDate3 . " should be equal to itself.");
-  if (!$oDate3->fbIsBefore($oDate4)) throw new Exception((string)$oDate3 . " should be before " . (string)$oDate4 . ".");
-  
-  if (!$oDate4->fbIsAfter($oDate1)) throw new Exception((string)$oDate4 . " should be after " . (string)$oDate1 . ".");
-  if (!$oDate4->fbIsAfter($oDate2)) throw new Exception((string)$oDate4 . " should be after " . (string)$oDate2 . ".");
-  if (!$oDate4->fbIsAfter($oDate3)) throw new Exception((string)$oDate4 . " should be after " . (string)$oDate3 . ".");
-  if (!$oDate4->fbIsEqualTo($oDate4)) throw new Exception((string)$oDate4 . " should be equal to itself.");
+  fCompareDates($oDate1, "IsEqualTo", $oDate1);
+  fCompareDates($oDate1, "IsBefore", $oDate2);
+  fCompareDates($oDate1, "IsBefore", $oDate3);
+  fCompareDates($oDate1, "IsBefore", $oDate4);
+
+  fCompareDates($oDate2, "IsAfter", $oDate1);
+  fCompareDates($oDate2, "IsEqualTo", $oDate2);
+  fCompareDates($oDate2, "IsBefore", $oDate3);
+  fCompareDates($oDate2, "IsBefore", $oDate4);
+
+  fCompareDates($oDate3, "IsAfter", $oDate1);
+  fCompareDates($oDate3, "IsAfter", $oDate2);
+  fCompareDates($oDate3, "IsEqualTo", $oDate3);
+  fCompareDates($oDate3, "IsBefore", $oDate4);
+
+  fCompareDates($oDate4, "IsAfter", $oDate1);
+  fCompareDates($oDate4, "IsAfter", $oDate2);
+  fCompareDates($oDate4, "IsAfter", $oDate3);
+  fCompareDates($oDate4, "IsEqualTo", $oDate4);
   
   $o0MYSQLDate = cDate::fo0FromMYSQLDateTime(null);
   if (!is_null($o0MYSQLDate)) throw new Exception((string)$o0MYSQLDate . " should be null");

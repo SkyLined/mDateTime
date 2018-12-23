@@ -175,13 +175,25 @@ const cDate = (function() {
   // This object has valueOf(), which returns the number of milliseconds since the epoch, so you can also
   // use (this.valueOf() < oDate.valueOf(), this.valueOf() == oDate.valueOf(), and this.valueOf() > oDate.valueOf())
   cDate.prototype.fbIsBefore = function cDate_fbIsBefore(oDate) {
-    return this.uYear < oDate.uYear || this.uMonth < oDate.uMonth || this.uDay < oDate.uDay;
+    if (this.__uYear < oDate.uYear) return true;
+    if (this.__uYear > oDate.uYear) return false;
+    if (this.__uMonth < oDate.uMonth) return true;
+    if (this.__uMonth > oDate.uMonth) return false;
+    if (this.__uDay < oDate.uDay) return true;
+    //if (this.__uDay > oDate.uDay) return false;
+    return false;
   };
   cDate.prototype.fbIsEqualTo = function cDate_fbIsBefore(oDate) {
-    return this.uYear == oDate.uYear || this.uMonth == oDate.uMonth || this.uDay == oDate.uDay;
+    return this.__uYear == oDate.uYear && this.__uMonth == oDate.uMonth && this.__uDay == oDate.uDay;
   };
   cDate.prototype.fbIsAfter = function cDate_fbIsAfter(oDate) {
-    return this.uYear > oDate.uYear || this.uMonth > oDate.uMonth || this.uDay > oDate.uDay;
+    if (this.__uYear > oDate.uYear) return true;
+    if (this.__uYear < oDate.uYear) return false;
+    if (this.__uMonth > oDate.uMonth) return true;
+    if (this.__uMonth < oDate.uMonth) return false;
+    if (this.__uDay > oDate.uDay) return true;
+    //if (this.__uDay < oDate.uDay) return false;
+    return false;
   };
 
   cDate.prototype.fbIsInThePast = function cDate_fbIsInThePast() {

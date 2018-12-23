@@ -155,11 +155,23 @@ class cDate(object):
     return oDuration;
   
   def fbIsBefore(oSelf, oDate):
-    return oSelf.__uYear < oDate.uYear or oSelf.__uMonth < oDate.uMonth or oSelf.__uDay < oDate.uDay;
+    if oSelf.__uYear < oDate.uYear: return True;
+    if oSelf.__uYear > oDate.uYear: return False;
+    if oSelf.__uMonth < oDate.uMonth: return True;
+    if oSelf.__uMonth > oDate.uMonth: return False;
+    if oSelf.__uDay < oDate.uDay: return True;
+    #if oSelf.__uDay > oDate.uDay: return False;
+    return False;
   def fbIsEqualTo(oSelf, oDate):
-    return oSelf.__uYear == oDate.uYear or oSelf.__uMonth == oDate.uMonth or oSelf.__uDay == oDate.uDay;
+    return oSelf.__uYear == oDate.uYear and oSelf.__uMonth == oDate.uMonth and oSelf.__uDay == oDate.uDay;
   def fbIsAfter(oSelf, oDate):
-    return oSelf.__uYear > oDate.uYear or oSelf.__uMonth > oDate.uMonth or oSelf.__uDay > oDate.uDay;
+    if oSelf.__uYear > oDate.uYear: return True;
+    if oSelf.__uYear < oDate.uYear: return False;
+    if oSelf.__uMonth > oDate.uMonth: return True;
+    if oSelf.__uMonth < oDate.uMonth: return False;
+    if oSelf.__uDay > oDate.uDay: return True;
+    #if oSelf.__uDay < oDate.uDay: return False;
+    return False;
   
   def fbIsInThePast(oSelf):
     return oSelf.fbIsBefore(oSelf.foNow());

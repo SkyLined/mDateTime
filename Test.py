@@ -91,29 +91,42 @@ except Exception:
 else:
   raise AssertionError("%s should not be possible." % oTestDate);
 
+def fCompareDates(oDate1, sResults, oDate2):
+  if sResults == "IsBefore":
+    if not oDate1.fbIsBefore(oDate2): raise AssertionError("%s should be before %s." % (oDate1, oDate2));
+  else:
+    if oDate1.fbIsBefore(oDate2): raise AssertionError("%s should not be before %s." % (oDate1, oDate2));
+  if sResults == "IsEqualTo":
+    if not oDate1.fbIsEqualTo(oDate2): raise AssertionError("%s should be equal to %s." % (oDate1, oDate2));
+  else:
+    if oDate1.fbIsEqualTo(oDate2): raise AssertionError("%s should not be equal to %s." % (oDate1, oDate2));
+  if sResults == "IsAfter":
+    if not oDate1.fbIsAfter(oDate2): raise AssertionError("%s should be after %s." % (oDate1, oDate2));
+  else:
+    if oDate1.fbIsAfter(oDate2): raise AssertionError("%s should not be after %s." % (oDate1, oDate2));
+
 oDate1 = cDate(2000, 1, 1);
 oDate2 = cDate(2000, 1, 2);
 oDate3 = cDate(2000, 2, 1);
 oDate4 = cDate(2001, 1, 1);
-if not oDate1.fbIsEqualTo(oDate1): raise AssertionError("%s should be equal to itself." % oDate1);
-if not oDate1.fbIsBefore(oDate2): raise AssertionError("%s should be before %s." % (oDate1, oDate2));
-if not oDate1.fbIsBefore(oDate3): raise AssertionError("%s should be before %s." % (oDate1, oDate3));
-if not oDate1.fbIsBefore(oDate4): raise AssertionError("%s should be before %s." % (oDate1, oDate4));
+fCompareDates(oDate1, "IsEqualTo", oDate1);  
+fCompareDates(oDate1, "IsBefore", oDate2);  
+fCompareDates(oDate1, "IsBefore", oDate3);  
+fCompareDates(oDate1, "IsBefore", oDate4);  
 
-if not oDate2.fbIsAfter(oDate1): raise AssertionError("%s should be after %s." % (oDate2, oDate1));
-if not oDate2.fbIsEqualTo(oDate2): raise AssertionError("%s should be equal to itself." % oDate2);
-if not oDate2.fbIsBefore(oDate3): raise AssertionError("%s should be before %s." % (oDate2, oDate3));
-if not oDate2.fbIsBefore(oDate4): raise AssertionError("%s should be before %s." % (oDate2, oDate4));
+fCompareDates(oDate2, "IsAfter", oDate1);  
+fCompareDates(oDate2, "IsEqualTo", oDate2);  
+fCompareDates(oDate2, "IsBefore", oDate3);  
+fCompareDates(oDate2, "IsBefore", oDate4);  
 
-if not oDate3.fbIsAfter(oDate1): raise AssertionError("%s should be after %s." % (oDate3, oDate1));
-if not oDate3.fbIsAfter(oDate2): raise AssertionError("%s should be after %s." % (oDate3, oDate2));
-if not oDate3.fbIsEqualTo(oDate3): raise AssertionError("%s should be equal to itself." % oDate3);
-if not oDate3.fbIsBefore(oDate4): raise AssertionError("%s should be before %s." % (oDate3, oDate4));
+fCompareDates(oDate3, "IsAfter", oDate1);  
+fCompareDates(oDate3, "IsAfter", oDate2);  
+fCompareDates(oDate3, "IsEqualTo", oDate3);  
+fCompareDates(oDate3, "IsBefore", oDate4);  
 
-if not oDate4.fbIsAfter(oDate1): raise AssertionError("%s should be after %s." % (oDate4, oDate1));
-if not oDate4.fbIsAfter(oDate2): raise AssertionError("%s should be after %s." % (oDate4, oDate2));
-if not oDate4.fbIsAfter(oDate3): raise AssertionError("%s should be after %s." % (oDate4, oDate3));
-if not oDate4.fbIsEqualTo(oDate4): raise AssertionError("%s should be equal to itself." % oDate4);
-
+fCompareDates(oDate4, "IsAfter", oDate1);  
+fCompareDates(oDate4, "IsAfter", oDate2);  
+fCompareDates(oDate4, "IsAfter", oDate3);  
+fCompareDates(oDate4, "IsEqualTo", oDate4);  
 
 print "All tests successful.";

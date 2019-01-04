@@ -111,7 +111,7 @@ class cDateDuration(object):
     return (asComponents[0] + ", " + asComponents[1] + ", and " + asComponents[2]) \
         if len(asComponents) == 3 else " and ".join(asComponents);
   
-  def toJSON(oSelf):
+  def fxToJSON(oSelf):
     return oSelf.fsToString();
   def fsToString(oSelf):
     if oSelf.fbIsZero(): return "0d";

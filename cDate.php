@@ -28,7 +28,7 @@
     return is_int($xDay) && $xDay >= 1 && $xDay <= 31;
   };
   function fbIsValidDate($uYear, $uMonth, $uDay) {
-    return $uDay <= cal_days_in_month(CAL_GREGORIAN, $uMonth, $uYear);
+    return $uDay <= fuGetLastDayInMonth0Based($uYear, $uMonth - 1);
   };
   function fsGetDataString($uYear, $uMonth, $uDay) {
     return (
@@ -36,6 +36,10 @@
       . "-" . str_pad($uMonth, 2, "0", STR_PAD_LEFT)
       . "-" . str_pad($uDay, 2, "0", STR_PAD_LEFT)
     );
+  };
+  
+  function fuGetLastDayInMonth0Based($uYear, $uMonth0Based) {
+    return cal_days_in_month(CAL_GREGORIAN, $uMonth0Based + 1, $uYear);
   };
   
   class cDate implements JsonSerializable {
@@ -147,13 +151,32 @@
       $this->__uDay = $uDay;
     }
     
-    public function foGetEndDateForDuration($oDateDuration) {
-      // Native functions exist to do this; reuse them.
+    public function foGetEndDateForDuration($oDuration) {
+      // Native functions exist to do this but they believe 2001-01-30 + 1m == 2001-03-02, which I personally
+      // do not think is correct, so we do it manually.
+      // Note that this code ignores the time (if any) in oDuration
+      // Add the year and month:
+      $uNewYear = $this->__uYear + $oDuration->iYears;
+      $uNewMonth0Based = $this->__uMonth - 1 + $oDuration->iMonths;
+      # If uNewMonth < 0 or > 11, convert the excess to years and add it.
+      $uNewYear += (int)floor($uNewMonth0Based / 12);
+      $uNewMonth0Based = (($uNewMonth0Based % 12) + ($uNewMonth0Based < 0 ? 12 : 0)) % 12;
+      # If we added months and ended up in another month in which the current day does not exist (e.g. Feb 31st)
+      # reduce the day (i.e. Feb 28th/29th)
+      $uLastDayInNewMonth = fuGetLastDayInMonth0Based($uNewYear, $uNewMonth0Based);
+      $uNewDay = $this->uDay <= $uLastDayInNewMonth ? $this->__uDay : $uLastDayInNewMonth;
+      # Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
+      # converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
+      $oEndPHPDateTime = (new cDate($uNewYear, $uNewMonth0Based + 1, $uNewDay))->foToPHPDateTime();
+      $oEndPHPDateTime->modify((string)$oDuration->iDays . " day");
+      $oEndDate = cDate::foFromPHPDateTime($oEndPHPDateTime);
+      return $oEndDate;
+      #############
       $oEndPHPDateTime = $this->foToPHPDateTime();
       $oEndPHPDateTime->modify(
-        (string)$oDateDuration->iYears . " year " .
-        (string)$oDateDuration->iMonths . " month " .
-        (string)$oDateDuration->iDays . " day"
+        (string)$oDuration->iYears . " year " .
+        (string)$oDuration->iMonths . " month " .
+        (string)$oDuration->iDays . " day"
       );
       $oEndDate = cDate::foFromPHPDateTime($oEndPHPDateTime);
       return $oEndDate;
@@ -161,9 +184,9 @@
     public function foStartDateForDuration($oDuration) {
       $oStartPHPDateTime = $this->foToPHPDateTime();
       $oStartPHPDateTime->modify(
-        (string)(-$oDateDuration->iYears) . " years " .
-        (string)(-$oDateDuration->iMonths) . " months " .
-        (string)(-$oDateDuration->iDays) . " days"
+        (string)(-$oDuration->iYears) . " years " .
+        (string)(-$oDuration->iMonths) . " months " .
+        (string)(-$oDuration->iDays) . " days"
       );
       return cDate::foFromPHPDateTime($oStartPHPDateTime);
     }

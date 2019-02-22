@@ -33,6 +33,10 @@ const cDate = (function() {
       uDay.toString().padStart(2, "0"),
     ].join("-");
   };
+  function fuGetLastDayInMonth0Based(uYear, uMonth0Based) {
+    return new Date(uYear, uMonth0Based + 1, 0).getDate();
+  };
+  
   // constructor
   function cDate(uYear, uMonth, uDay) {
     if (!this) return new cDate(uYear, uMonth, uDay);
@@ -120,20 +124,21 @@ const cDate = (function() {
   cDate.prototype.foGetEndDateForDuration = function cDate_foEndDateForDuration(oDuration) {
     // Note that this code ignores the time (if any) in oDuration
     // Add the year and month:
-    let uNewYear = this.__uYear + oDuration.iYears,
-        uNewMonth0Based = this.__uMonth - 1 + oDuration.iMonths;
+    let uNewYear = this.__uYear + oDuration.iYears;
+    let uNewMonth0Based = this.__uMonth - 1 + oDuration.iMonths;
     // If uNewMonth < 0 or > 11, convert the excess to years and add it.
     uNewYear += Math.floor(uNewMonth0Based / 12);
     uNewMonth0Based = ((uNewMonth0Based % 12) + (uNewMonth0Based < 0 ? 12 : 0)) % 12;
-    // Add the days by creating the JavaScript Date equivalent for the first day of the month and converting that to
-    // a milliseconds time-stamp. Then add the days until the original day of the month and the days in the duration
-    // (both converted to milliseconds as well). Finally convert that timestamp back into a JavaScript Date and then
-    // a cDate. This allows us to reuse the JavaScript API for tracking the number of days in each month.
-    const oEndJSDateWithoutDays = new Date(uNewYear + "-" + (uNewMonth0Based + 1) + "-01"),
-          oEndJSDate = new Date(
-            oEndJSDateWithoutDays.valueOf() + (this.__uDay - 1 + oDuration.iDays) * 24 * 60 * 60 * 1000
-          );
-    return cDate.foFromJSDate(oEndJSDate);
+    // If we added months and ended up in another month in which the current day does not exist (e.g. Feb 31st)
+    // reduce the day (i.e. Feb 28th/29th)
+    const uLastDayInNewMonth = fuGetLastDayInMonth0Based(uNewYear, uNewMonth0Based),
+          uNewDayInNewMonth = this.uDay <= uLastDayInNewMonth ? this.__uDay : uLastDayInNewMonth;
+    // Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
+    // converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
+    const oEndDate = cDate.foFromJSDate(
+      new Date(uNewYear, uNewMonth0Based, uNewDayInNewMonth + oDuration.iDays)
+    );
+    return oEndDate;
   };
   cDate.prototype.foGetDurationForEndDate = function cDate_foGetDurationForEndDate(oEndDate) {
     // If the end date is before this date, the duration is going to be negative.
@@ -142,12 +147,12 @@ const cDate = (function() {
     const bNegativeDuration = oEndDate.fbIsBefore(this),
           uDurationMultiplier = bNegativeDuration ? -1 : 1, // Used to potentially invert the duration later.
           oFirstDate = bNegativeDuration ? oEndDate : this,
-          oLastDate = bNegativeDuration ? this : oEndDate,
-          uDurationYears = oLastDate.uYear - oFirstDate.uYear,
-          uDurationMonths = oLastDate.uMonth - oFirstDate.uMonth,
-          uDurationDays = oLastDate.uDay - oFirstDate.uDay,
-          // The number of days in the last month various
-          uDaysInLastDatesPreviousMonth = new Date(oLastDate.uYear - (oLastDate.uMonth == 1 ? 1 : 0), ((oLastDate.uMonth + 10) % 12 + 1), 0).getDate();
+          oLastDate = bNegativeDuration ? this : oEndDate;
+    let uDurationYears = oLastDate.uYear - oFirstDate.uYear,
+        uDurationMonths = oLastDate.uMonth - oFirstDate.uMonth,
+        uDurationDays = oLastDate.uDay - oFirstDate.uDay,
+        // The number of days in the last month various
+        uDaysInLastDatesPreviousMonth = new Date(oLastDate.uYear - (oLastDate.uMonth == 1 ? 1 : 0), ((oLastDate.uMonth + 10) % 12 + 1), 0).getDate();
     if (uDurationDays >= oLastDate.uDay) {
       // If uDurationDays > last date's day, adding the days moved it into a new month; convert this into a month and adjust the days.
       // e.g. 2000-1-31 -> 2000-2-2 => -1m+29d (at this point) => +2d (after this adjustment)

@@ -6,9 +6,9 @@ def fMustBeEqual(xValue1, xValue2, sErrorMessage):
     and (isinstance(xValue2, cDate) or isinstance(xValue2, cDateDuration))
     and str(xValue1) == str(xValue2)
   ):
-    raise Error(sErrorMessage);
+    raise Exception(sErrorMessage);
 
-def fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate):
+def fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate, sNormalizedDuration = None):
   oStartDate = cDate.foFromString(sStartDate);
   oDuration = cDateDuration.foFromString(sDuration);
   oEndDate = cDate.foFromString(sEndDate);
@@ -18,13 +18,15 @@ def fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate):
   fMustBeEqual(
     oEndDate,
     oCalculatedEndDate,
-    "%s %s == %s (NOT %s)" % (sStartDate, sDuration, oCalculatedEndDate, sEndDate)
+    "%s + %s == %s (NOT %s)" % (sStartDate, sDuration, oCalculatedEndDate, sEndDate)
   );
   fMustBeEqual(
     oCalculatedDuration,
     oNormalizedDuration,
     "%s -> %s == %s (NOT %s)" % (sStartDate, sEndDate, oCalculatedDuration, oNormalizedDuration)
   );
+  if (sNormalizedDuration and sNormalizedDuration != str(oNormalizedDuration)):
+    raise Exception("%s -> %s == %s (NOT %s)" % (sStartDate, sEndDate, oNormalizedDuration, sNormalizedDuration));
 
 def fNormalizedDurationForDateMustEqual(sDuration, sDate, sNormalizedDuration):
   oNormalizedDuration = cDateDuration.foFromString(sDuration).foNormalizedForDate(cDate.foFromString(sDate));
@@ -56,6 +58,12 @@ fDatePlustDurationMustEqual("2000-01-01", "+1y1m1d", "2001-02-02");
 fNormalizedDurationForDateMustEqual("1y1m1d", "2000-01-01", "1y1m1d");
 fNormalizedDurationForDateMustEqual("+1y-1m+31d", "2000-01-01", "1y");
 fNormalizedDurationForDateMustEqual("+2 years, -12 months, -366 day", "2000-01-01", "0d");
+
+# Check day/month is adjusted if needed when months are added to potentially overflow the day.
+fDatePlustDurationMustEqual("2000-01-30", "1m", "2000-02-29", "30d");
+fDatePlustDurationMustEqual("2001-01-30", "1m", "2001-02-28", "29d");
+fDatePlustDurationMustEqual("2001-01-29", "1m", "2001-02-28", "30d");
+fDatePlustDurationMustEqual("2001-01-28", "1m", "2001-02-28", "1m");
 
 oTestDate = cDate(2000, 2, 28);
 oFromStringTestDate = cDate.foFromString("2000-02-28");

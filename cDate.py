@@ -21,9 +21,12 @@ def fbIsValidMonth(uMonth):
 def fbIsValidDay(uDay):
   return type(uDay) in [long, int, float] and uDay % 1 == 0 and uDay >= 1 and uDay <= 31;
 def fbIsValidDate(uYear, uMonth, uDay):
-  return type(uDay) in [long, int, float] and uMonth % 1 == 0 and uDay >= 1 and uDay <= calendar.monthrange(uYear, uMonth)[1];
+  return type(uDay) in [long, int, float] and uMonth % 1 == 0 and uDay >= 1 and uDay <= fuGetLastDayInMonth0Based(uYear, uMonth - 1);
 def fsGetDateString(uYear, uMonth, uDay):
   return "%04d-%02d-%02d" % (uYear, uMonth, uDay);
+
+def fuGetLastDayInMonth0Based(uYear, uMonth0Based):
+  return calendar.monthrange(uYear, uMonth0Based + 1)[1];
 
 class cDate(object):
   # constructor
@@ -111,10 +114,14 @@ class cDate(object):
     # If uNewMonth < 0 or > 11, convert the excess to years and add it.
     uNewYear += long(uNewMonth0Based / 12);
     uNewMonth0Based = ((uNewMonth0Based % 12) + (12 if uNewMonth0Based < 0 else 0)) % 12;
+    # If we added months and ended up in another month in which the current day does not exist (e.g. Feb 31st)
+    # reduce the day (i.e. Feb 28th/29th)
+    uLastDayInNewMonth = fuGetLastDayInMonth0Based(uNewYear, uNewMonth0Based);
+    uNewDayInNewMonth = oSelf.__uDay if oSelf.uDay <= uLastDayInNewMonth else uLastDayInNewMonth;
     # Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
     # converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
     oEndDate = oSelf.foFromPyDate(
-      datetime.date(uNewYear, (uNewMonth0Based + 1), oSelf.__uDay)
+      datetime.date(uNewYear, (uNewMonth0Based + 1), uNewDayInNewMonth)
       + datetime.timedelta(oDuration.iDays)
     );
     return oEndDate;
@@ -131,7 +138,7 @@ class cDate(object):
     uDurationMonths = oLastDate.uMonth - oFirstDate.uMonth;
     uDurationDays = oLastDate.uDay - oFirstDate.uDay;
     # The number of days in the last month various
-    uDaysInLastDatesPreviousMonth = calendar.monthrange(oLastDate.uYear - (1 if oLastDate.uMonth == 1 else 0), ((oLastDate.uMonth + 10) % 12) + 1)[1];
+    uDaysInLastDatesPreviousMonth = fuGetLastDayInMonth0Based(oLastDate.uYear - (1 if oLastDate.uMonth == 1 else 0), ((oLastDate.uMonth + 10) % 12));
     if uDurationDays >= oLastDate.uDay:
       # If uDurationDays > last date's day, adding the days moved it into a new month; convert this into a month and adjust the days.
       # e.g. 2000-1-31 -> 2000-2-2 => -1m+29d (at this point) => +2d (after this adjustment)
@@ -144,7 +151,7 @@ class cDate(object):
       uDurationDays += uDaysInLastDatesPreviousMonth;
     # If uDurationMonths < 0 or >= 12, convert the excess to years and add them.
     if uDurationMonths < 0 or uDurationMonths >= 12:
-      uDurationYears += Math.floor(uDurationMonths / 12) + (-1 if uDurationMonths < 0 else 0);
+      uDurationYears += long(uDurationMonths / 12) + (-1 if uDurationMonths < 0 else 0);
       uDurationMonths = (uDurationMonths % 12) + (12 if uDurationMonths < 0 else 0);
     from cDateDuration import cDateDuration;
     oDuration = cDateDuration(

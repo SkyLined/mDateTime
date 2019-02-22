@@ -21,7 +21,7 @@
           throw new Error(sErrorMessage);
         };
       };
-      function fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate) {
+      function fDatePlusDurationMustEqual(sStartDate, sDuration, sEndDate, sNormalizedDuration) {
         const oStartDate = cDate.foFromString(sStartDate),
               oDuration = cDateDuration.foFromString(sDuration),
               oEndDate = cDate.foFromString(sEndDate),
@@ -31,13 +31,16 @@
         fMustBeEqual(
           oEndDate,
           oCalculatedEndDate,
-          sStartDate + " " + sDuration + " == " + oCalculatedEndDate.toString() + " (NOT " + sEndDate.toString() + ")"
+          sStartDate + " + " + sDuration + " == " + oCalculatedEndDate.toString() + " (NOT " + sEndDate.toString() + ")"
         );
         fMustBeEqual(
           oCalculatedDuration,
           oNormalizedDuration,
           sStartDate + " -> " + sEndDate + " == " + oCalculatedDuration.toString() + " (NOT " + oNormalizedDuration.toString() + ")"
         );
+        if (sNormalizedDuration && oNormalizedDuration.toString() != sNormalizedDuration) {
+          throw new Error(sStartDate + " -> " + sEndDate + " == " + oNormalizedDuration.toString() + " (NOT " + sNormalizedDuration + ")");
+        };
       };
       function fNormalizedDurationForDateMustEqual(sDuration, sDate, sExpectedNormalizedDuration) {
         const oNormalizedDuration = cDateDuration.foFromString(sDuration).foNormalizedForDate(cDate.foFromString(sDate));
@@ -47,24 +50,24 @@
           sDuration + " normalized for " + sDate + " == " + oNormalizedDuration.toString() + " (NOT " + sExpectedNormalizedDuration + ")"
         );
       };
-      fDatePlustDurationMustEqual("2000-01-01", "+1y", "2001-01-01");
-      fDatePlustDurationMustEqual("2000-01-01", "+12m", "2001-01-01");
-      fDatePlustDurationMustEqual("2000-01-01", "+366d", "2001-01-01"); // 2000 is a leap year.
-      fDatePlustDurationMustEqual("2001-01-01", "+1y", "2002-01-01");
-      fDatePlustDurationMustEqual("2001-01-01", "+12m", "2002-01-01");
-      fDatePlustDurationMustEqual("2001-01-01", "+365d", "2002-01-01"); // 2001 is not a leap year.
+      fDatePlusDurationMustEqual("2000-01-01", "+1y", "2001-01-01");
+      fDatePlusDurationMustEqual("2000-01-01", "+12m", "2001-01-01");
+      fDatePlusDurationMustEqual("2000-01-01", "+366d", "2001-01-01"); // 2000 is a leap year.
+      fDatePlusDurationMustEqual("2001-01-01", "+1y", "2002-01-01");
+      fDatePlusDurationMustEqual("2001-01-01", "+12m", "2002-01-01");
+      fDatePlusDurationMustEqual("2001-01-01", "+365d", "2002-01-01"); // 2001 is not a leap year.
       
-      fDatePlustDurationMustEqual("2000-02-01", "+28d", "2000-02-29"); // 2000 is a leap year.
-      fDatePlustDurationMustEqual("2000-02-01", "+29d", "2000-03-01"); // 2000 is a leap year.
-      fDatePlustDurationMustEqual("2001-02-01", "+28d", "2001-03-01"); // 2001 is not a leap year.
-      fDatePlustDurationMustEqual("2000-01-01", "+1y+1m+28d", "2001-03-01"); // 2001 is not a leap year; days are applied last.
+      fDatePlusDurationMustEqual("2000-02-01", "+28d", "2000-02-29"); // 2000 is a leap year.
+      fDatePlusDurationMustEqual("2000-02-01", "+29d", "2000-03-01"); // 2000 is a leap year.
+      fDatePlusDurationMustEqual("2001-02-01", "+28d", "2001-03-01"); // 2001 is not a leap year.
+      fDatePlusDurationMustEqual("2000-01-01", "+1y+1m+28d", "2001-03-01"); // 2001 is not a leap year; days are applied last.
       
-      fDatePlustDurationMustEqual("2000-01-01", "+1m", "2000-02-01");
-      fDatePlustDurationMustEqual("2000-01-01", "+31d", "2000-02-01");
+      fDatePlusDurationMustEqual("2000-01-01", "+1m", "2000-02-01");
+      fDatePlusDurationMustEqual("2000-01-01", "+31d", "2000-02-01");
       
-      fDatePlustDurationMustEqual("2000-01-01", "+1d", "2000-01-02");
+      fDatePlusDurationMustEqual("2000-01-01", "+1d", "2000-01-02");
       
-      fDatePlustDurationMustEqual("2000-01-01", "+1y1m1d", "2001-02-02");
+      fDatePlusDurationMustEqual("2000-01-01", "+1y1m1d", "2001-02-02");
       
       fNormalizedDurationForDateMustEqual("1y1m1d", "2000-01-01", "1y1m1d");
       fNormalizedDurationForDateMustEqual("+1y-1m+31d", "2000-01-01", "1y");
@@ -79,6 +82,12 @@
       fMustBeEqual(oTestDate, oFromStringTestDate, "cDate.foFromString(\"2000-02-28\") should not result in " + oFromStringTestDate.toString());
       fMustBeEqual(oTestDate, oFromJSONTestDate, "cDate.foFromJSON(\"2000-02-28\") should not result in " + oFromJSONTestDate.toString());
       fMustBeEqual(oTestDate, oClonedTestDate, oTestDate + " should not be cloned as " + oClonedTestDate.toString());
+      
+      // Check day/month is adjusted if needed when months are added to potentially overflow the day.
+      fDatePlusDurationMustEqual("2000-01-30", "1m", "2000-02-29", "30d");
+      fDatePlusDurationMustEqual("2001-01-30", "1m", "2001-02-28", "29d");
+      fDatePlusDurationMustEqual("2001-01-29", "1m", "2001-02-28", "30d");
+      fDatePlusDurationMustEqual("2001-01-28", "1m", "2001-02-28", "1m");
       
       oTestDate.uDay = 29;
       let bHasThrownException = false;

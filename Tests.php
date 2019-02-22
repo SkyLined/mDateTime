@@ -10,13 +10,13 @@
       && ($xValue2 instanceof cDate || $xValue2 instanceof cDateDuration)
       && (string)$xValue1 == (string)$xValue2
     )) {
-      error_log(($xValue1 instanceof cDate) ? "T" : "F");
-      error_log(($xValue2 instanceof cDate) ? "T" : "F");
-      error_log(((string)$xValue1 == (string)$xValue2) ? "T" : "F");
+      error_log("xValue1 is " . (($xValue1 instanceof cDate) ? "" : "not ") . "a date.");
+      error_log("xValue2 is " . (($xValue2 instanceof cDate) ? "" : "not ") . "a date.");
+      error_log("xValue1 " . (((string)$xValue1 == (string)$xValue2) ? "==" : "!=") . " xValue2.");
       throw new Exception($sErrorMessage);
     };
   };
-  function fDatePlustDurationMustEqual($sStartDate, $sDuration, $sEndDate) {
+  function fDatePlustDurationMustEqual($sStartDate, $sDuration, $sEndDate, $sNormalizedDuration = NULL) {
     $oStartDate = cDate::foFromString($sStartDate);
     $oDuration = cDateDuration::foFromString($sDuration);
     $oEndDate = cDate::foFromString($sEndDate);
@@ -26,13 +26,18 @@
     fMustBeEqual(
       $oEndDate,
       $oCalculatedEndDate,
-      (string)$sStartDate . " " . $sDuration . " == " . (string)$oCalculatedEndDate . " (NOT " . $sEndDate . ")"
+      (string)$sStartDate . " + " . $sDuration . " == " . (string)$oCalculatedEndDate . " (NOT " . $sEndDate . ")"
     );
     fMustBeEqual(
       $oCalculatedDuration,
       $oNormalizedDuration,
-      (string)$sStartDate . " -> " . $sEndDate . " == " . (string)$oCalculatedDuration . " (NOT " . $oNormalizedDuration . ")"
+      (string)$sStartDate . " -> " . $sEndDate . " == " . (string)$oCalculatedDuration . " (NOT " . (string)$oNormalizedDuration . ")"
     );
+    if ($sNormalizedDuration && $sNormalizedDuration != (string)$oNormalizedDuration) {
+      throw new Exception(
+        (string)$sStartDate . " -> " . $sEndDate . " == " . (string)$oNormalizedDuration . " (NOT " . $sNormalizedDuration . ")"
+      );
+    };
   };
   function fNormalizedDurationForDateMustEqual($sDuration, $sDate, $sNormalizedDuration) {
     $oNormalizedDuration = cDateDuration::foFromString($sDuration)->foNormalizedForDate(cDate::foFromString($sDate));
@@ -74,6 +79,12 @@
   fMustBeEqual($oTestDate, $oFromJSONTestDate, "cDate::foFromJSON(\"2000-02-28\") should not result in " . (string)$oFromJSONTestDate);
   fMustBeEqual($oTestDate, $oFromMYSQLTestDate, "cDate::foFromMYSQL(\"2000-02-28\") should not result in " . (string)$oFromMYSQLTestDate);
   fMustBeEqual($oTestDate, $oClonedTestDate, (string)$oTestDate . " should not be cloned as " . (string)$oClonedTestDate);
+  
+  // Check day/month is adjusted if needed when months are added to potentially overflow the day.
+  fDatePlustDurationMustEqual("2000-01-30", "1m", "2000-02-29", "30d");
+  fDatePlustDurationMustEqual("2001-01-30", "1m", "2001-02-28", "29d");
+  fDatePlustDurationMustEqual("2001-01-29", "1m", "2001-02-28", "30d");
+  fDatePlustDurationMustEqual("2001-01-28", "1m", "2001-02-28", "1m");
   
   $oTestDate->uDay = 29;
   $bHasThrownException = false;

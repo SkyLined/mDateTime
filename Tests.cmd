@@ -1,53 +1,38 @@
 @ECHO OFF
 SETLOCAL
-IF DEFINED PYTHON (
-  CALL :CHECK_PYTHON
-  IF ERRORLEVEL 1 (ENDLOCAL & EXIT /B 1)
-) ELSE (
-  REM Try to detect the location of python automatically
-  FOR /F "usebackq delims=" %%I IN (`where "python" 2^>nul`) DO SET PYTHON="%%~I"
-  IF NOT DEFINED PYTHON (
-    REM Check if python is found in its default installation path.
-    SET PYTHON="%SystemDrive%\Python27\python.exe"
-    CALL :CHECK_PYTHON
-    IF ERRORLEVEL 1 (ENDLOCAL & EXIT /B 1)
-  )
-)
-IF DEFINED PHP (
-  CALL :CHECK_PHP
-  IF ERRORLEVEL 1 (ENDLOCAL & EXIT /B 1)
-) ELSE (
-  REM Try to detect the location of PHP automatically
-  FOR /F "usebackq delims=" %%I IN (`where "php" 2^>nul`) DO SET PHP="%%~I"
-  IF NOT DEFINED PHP (
-    ECHO - Cannot find php.exe.
-  )
+REM Try to detect the location of python automatically
+SET PYTHON=
+FOR /F "usebackq delims=" %%I IN (`where "python" 2^>nul`) DO (
+  SET PYTHON="%%~I"
+  GOTO :FOUND_PYTHON
 )
 
+REM Check if python is found in its default installation path.
+IF NOT EXIST "%SystemDrive%\Python27\python.exe" (
+  SET PYTHON="%SystemDrive%\Python27\python.exe"
+)
+:FOUND_PYTHON
+
+SET PHP=
+REM Try to detect the location of PHP automatically
+FOR /F "usebackq delims=" %%I IN (`where "php" 2^>nul`) DO (
+  SET PHP="%%~I"
+  GOTO :FOUND_PHP
+)
+:FOUND_PHP
+
 IF DEFINED PYTHON (
-  CALL %PYTHON% "%~dpn0.py" %*
+  ECHO * Testing Python...
+  CALL %PYTHON% "%~dp0\Tests\Tests.py" %*
   IF ERRORLEVEL 1 (ENDLOCAL & EXIT /B 1)
+) ELSE (
+  ECHO - Cannot find python.exe.
 )
 IF DEFINED PHP (
-  CALL %PHP% "%~dpn0.php" %*
+  ECHO * Testing PHP...
+  CALL %PHP% "%~dp0\Tests\Tests.php" %*
   IF ERRORLEVEL 1 (ENDLOCAL & EXIT /B 1)
+) ELSE (
+  ECHO - Cannot find php.exe.
 )
 EXIT /B %ERRORLEVEL%
-
-:CHECK_PYTHON
-  REM Make sure path is quoted and check if it exists.
-  SET PYTHON="%PYTHON:"=%"
-  IF NOT EXIST %PYTHON% (
-    ECHO - Cannot find Python at %PYTHON%, please set the "PYTHON" environment variable to the correct path.
-    EXIT /B 1
-  )
-  EXIT /B 0
-
-:CHECK_PHP
-  REM Make sure path is quoted and check if it exists.
-  SET PHP="%PHP:"=%"
-  IF NOT EXIST %PHP% (
-    ECHO - Cannot find PHP at %PHP%, please set the "PHP" environment variable to the correct path.
-    EXIT /B 1
-  )
-  EXIT /B 0

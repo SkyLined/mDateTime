@@ -1,17 +1,81 @@
-from cDate import cDate;
-from cDateDuration import cDateDuration;
+import json, os, sys;
+
+# Augment the search path to make the test subject a package and have access to its modules folder.
+sTestsFolderPath = os.path.dirname(os.path.abspath(__file__));
+sMainFolderPath = os.path.dirname(sTestsFolderPath);
+sParentFolderPath = os.path.dirname(sMainFolderPath);
+sModulesFolderPath = os.path.join(sMainFolderPath, "modules");
+asOriginalSysPath = sys.path[:];
+sys.path = [sParentFolderPath, sModulesFolderPath] + asOriginalSysPath;
+# Load product details
+oProductDetailsFile = open(os.path.join(sMainFolderPath, "dxProductDetails.json"), "rb");
+try:
+  dxProductDetails = json.load(oProductDetailsFile);
+finally:
+  oProductDetailsFile.close();
+# Save the list of names of loaded modules:
+asOriginalModuleNames = sys.modules.keys();
+
+__import__(dxProductDetails["sProductName"], globals(), locals(), [], -1);
+
+# Sub-packages should load all modules relative, or they will end up in the global namespace, which means they may get
+# loaded by the script importing it if it tries to load a differnt module with the same name. Obviously, that script
+# will probably not function when the wrong module is loaded, so we need to check that we did this correctly.
+asUnexpectedModules = list(set([
+  sModuleName.lstrip("_").split(".", 1)[0] for sModuleName in sys.modules.keys()
+  if not (
+    sModuleName in asOriginalModuleNames # This was loaded before
+    or sModuleName.lstrip("_").split(".", 1)[0] in (
+      [dxProductDetails["sProductName"]] +
+      dxProductDetails["asDependentOnProductNames"] +
+      [
+        # These built-in modules are expected:
+        "calendar", "datetime"
+      ]
+    )
+  )
+]));
+assert len(asUnexpectedModules) == 0, \
+      "Module(s) %s was/were unexpectedly loaded!" % ", ".join(sorted(asUnexpectedModules));
+
+#Import the test subject
+import mDateTime;
+
+# Restore the search path
+sys.path = asOriginalSysPath;
+
+# Sub-packages should load all modules relative, or they will end up in the global namespace, which means they may get
+# loaded by the script importing it if it tries to load a differnt module with the same name. Obviously, that script
+# will probably not function when the wrong module is loaded, so we need to check that we did this correctly.
+asUnexpectedModules = list(set([
+  sModuleName.lstrip("_").split(".", 1)[0] for sModuleName in sys.modules.keys()
+  if not (
+    sModuleName in asOriginalModuleNames # This was loaded before
+    or sModuleName.lstrip("_").split(".", 1)[0] in [
+      "mDateTime",
+      # These dependencies are expected:
+      # These built-in modules are expected:
+      "calendar", "datetime"
+    ]
+  )
+]));
+assert len(asUnexpectedModules) == 0, \
+      "Module(s) %s was/were unexpectedly loaded!" % ", ".join(sorted(asUnexpectedModules));
+# Restore the search path
+sys.path = asOriginalSysPath;
+
 def fMustBeEqual(xValue1, xValue2, sErrorMessage):
   if not (
-    (isinstance(xValue1, cDate) or isinstance(xValue1, cDateDuration))
-    and (isinstance(xValue2, cDate) or isinstance(xValue2, cDateDuration))
+    (isinstance(xValue1, mDateTime.cDate) or isinstance(xValue1, mDateTime.cDateDuration))
+    and (isinstance(xValue2, mDateTime.cDate) or isinstance(xValue2, mDateTime.cDateDuration))
     and str(xValue1) == str(xValue2)
   ):
     raise Exception(sErrorMessage);
 
 def fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate, sNormalizedDuration = None):
-  oStartDate = cDate.foFromString(sStartDate);
-  oDuration = cDateDuration.foFromString(sDuration);
-  oEndDate = cDate.foFromString(sEndDate);
+  oStartDate = mDateTime.cDate.foFromString(sStartDate);
+  oDuration = mDateTime.cDateDuration.foFromString(sDuration);
+  oEndDate = mDateTime.cDate.foFromString(sEndDate);
   oCalculatedEndDate = oStartDate.foGetEndDateForDuration(oDuration);
   oCalculatedDuration = oStartDate.foGetDurationForEndDate(oEndDate);
   oNormalizedDuration = oDuration.foNormalizedForDate(oStartDate);
@@ -29,10 +93,10 @@ def fDatePlustDurationMustEqual(sStartDate, sDuration, sEndDate, sNormalizedDura
     raise Exception("%s -> %s == %s (NOT %s)" % (sStartDate, sEndDate, oNormalizedDuration, sNormalizedDuration));
 
 def fNormalizedDurationForDateMustEqual(sDuration, sDate, sNormalizedDuration):
-  oNormalizedDuration = cDateDuration.foFromString(sDuration).foNormalizedForDate(cDate.foFromString(sDate));
+  oNormalizedDuration = mDateTime.cDateDuration.foFromString(sDuration).foNormalizedForDate(mDateTime.cDate.foFromString(sDate));
   fMustBeEqual(
     oNormalizedDuration,
-    cDateDuration.foFromString(sNormalizedDuration),
+    mDateTime.cDateDuration.foFromString(sNormalizedDuration),
     "%s normalized for %s == %s (NOT %s)" % (sDuration, sDate, oNormalizedDuration, sNormalizedDuration)
   );
 
@@ -65,9 +129,9 @@ fDatePlustDurationMustEqual("2001-01-30", "1m", "2001-02-28", "29d");
 fDatePlustDurationMustEqual("2001-01-29", "1m", "2001-02-28", "30d");
 fDatePlustDurationMustEqual("2001-01-28", "1m", "2001-02-28", "1m");
 
-oTestDate = cDate(2000, 2, 28);
-oFromStringTestDate = cDate.foFromString("2000-02-28");
-oFromJSONTestDate = cDate.foFromJSON("2000-02-28");
+oTestDate = mDateTime.cDate(2000, 2, 28);
+oFromStringTestDate = mDateTime.cDate.foFromString("2000-02-28");
+oFromJSONTestDate = mDateTime.cDate.foFromJSON("2000-02-28");
 oClonedTestDate = oTestDate.foClone();
 fMustBeEqual(oTestDate, oFromStringTestDate, "cDate.foFromString(\"2000-02-28\") should not result in %s" % oFromStringTestDate);
 fMustBeEqual(oTestDate, oFromJSONTestDate, "cDate.foFromJSON(\"2000-02-28\") should not result in %s" % oFromJSONTestDate);
@@ -113,10 +177,10 @@ def fCompareDates(oDate1, sResults, oDate2):
   else:
     if oDate1.fbIsAfter(oDate2): raise AssertionError("%s should not be after %s." % (oDate1, oDate2));
 
-oDate1 = cDate(2000, 1, 1);
-oDate2 = cDate(2000, 1, 2);
-oDate3 = cDate(2000, 2, 1);
-oDate4 = cDate(2001, 1, 1);
+oDate1 = mDateTime.cDate(2000, 1, 1);
+oDate2 = mDateTime.cDate(2000, 1, 2);
+oDate3 = mDateTime.cDate(2000, 2, 1);
+oDate4 = mDateTime.cDate(2001, 1, 1);
 fCompareDates(oDate1, "IsEqualTo", oDate1);  
 fCompareDates(oDate1, "IsBefore", oDate2);  
 fCompareDates(oDate1, "IsBefore", oDate3);  

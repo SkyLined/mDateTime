@@ -1,4 +1,5 @@
 <?php
+  // If all is well, this should work in PHP without the calendar module.
   namespace mDateTime;
   use \DateTime;
   use \DateTimeZone;
@@ -39,7 +40,8 @@
   };
   
   function fuGetLastDayInMonth0Based($uYear, $uMonth0Based) {
-    return cal_days_in_month(CAL_GREGORIAN, $uMonth0Based + 1, $uYear);
+    $bIsLeapYear = $uYear % 4 == 0 && ($uYear % 100 != 0 || $uYear % 400 == 0);
+    return $uMonth0Based == 1 ? ($bIsLeapYear ? 29 : 28) : (($uMonth0Based) % 7 % 2 ? 30 : 31); 
   };
   
   class cDate implements JsonSerializable {

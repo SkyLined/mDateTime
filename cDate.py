@@ -12,7 +12,10 @@ asMonths = [
   "July", "August", "September", "October", "November", "December"
 ];
 asOrdinalPostfixes = [
-  "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
+  "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 1-10
+  "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", # 11-20
+  "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
+  "st"                                                        # 31
 ];
 def fbIsValidYear(uYear):
   return type(uYear) in [long, int, float] and uYear % 1 == 0;
@@ -197,7 +200,7 @@ class cDate(object):
     # Month <day>th, <year>
     return "%s %d%s, %d" % (
       asMonths[oSelf.__uMonth - 1],
-      oSelf.__uDay, asOrdinalPostfixes[oSelf.__uDay % 10],
+      oSelf.__uDay, asOrdinalPostfixes[oSelf.__uDay],
       oSelf.__uYear,
     );
   def foToPyDate(oSelf):

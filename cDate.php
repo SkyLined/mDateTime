@@ -17,7 +17,10 @@
     "July", "August", "September", "October", "November", "December"
   ];
   CONST cDate_asOrdinalPostfixes = [
-    "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
+    "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 1-10
+    "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", # 11-20
+    "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
+    "st"                                                        # 31
   ];
   function fbIsValidYear($xYear) {
     return is_int($xYear);
@@ -247,7 +250,7 @@
       // Month <day>th, <year>
       return (
         cDate_asMonths[$this->__uMonth - 1]
-        . " " . (string)$this->__uDay . cDate_asOrdinalPostfixes[$this->__uDay % 10]
+        . " " . (string)$this->__uDay . cDate_asOrdinalPostfixes[$this->__uDay]
         . ", " . (string)$this->__uYear
       );
     }

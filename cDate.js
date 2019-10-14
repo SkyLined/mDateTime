@@ -12,7 +12,10 @@ const cDate = (function() {
           "July", "August", "September", "October", "November", "December"
         ],
         asOrdinalPostfixes = [
-          "th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"
+          "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 1-10
+          "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", # 11-20
+          "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
+          "st"                                                        # 31
         ];
   function fbIsValidYear(xYear) {
     return typeof(xYear) == "number" && !isNaN(xYear);
@@ -224,7 +227,7 @@ const cDate = (function() {
     // Month <day>th, <year>
     return (
       asMonths[this.__uMonth - 1]
-      + " " + this.__uDay.toString() + asOrdinalPostfixes[this.__uDay % 10]
+      + " " + this.__uDay.toString() + asOrdinalPostfixes[this.__uDay]
       + ", " + this.__uYear.toString()
     );
   };

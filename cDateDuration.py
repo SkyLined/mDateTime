@@ -40,16 +40,27 @@ class cDateDuration(object):
     if not fbIsValidInteger(iDays): raise ValueError("Invalid number of days " + repr(iDays) + ".");
     oSelf.__iDays = iDays;
   # static methods
+  @staticmethod
+  def fbIsValidDurationString(sDuration):
+    oDurationMatch = rDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
+    return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);
+  
   @classmethod
   def fo0FromJSON(cClass, sDuration):
     return None if sDuration is None else cClass.foFromJSON(sDuration);
   @classmethod
   def foFromJSON(cClass, sDuration):
+    # JSON encoding uses the "string value" of cDateDuration.
     return cClass.foFromString(sDuration);
-  @staticmethod
-  def fbIsValidDurationString(sDuration):
-    oDurationMatch = rDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
-    return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);
+  
+  @classmethod
+  def fo0FromMySQL(cClass, sDuration):
+    return None if sDuration is None else cClass.foFromMySQL(sDuration);
+  @classmethod
+  def foFromMySQL(cClass, sDuration):
+    # MySQL encoding uses the "string value" of cDateDuration.
+    return cClass.foFromString(sMySQL);
+  
   @classmethod
   def fo0FromString(cClass, sDuration):
     return None if sDuration is None else cClass.foFromString(sDuration);
@@ -112,6 +123,10 @@ class cDateDuration(object):
         if len(asComponents) == 3 else " and ".join(asComponents);
   
   def fxToJSON(oSelf):
+    # JSON encoding uses the "string value" of cDateDuration.
+    return oSelf.fsToString();
+  def fsToMySQL(oSelf):
+    # MySQL encoding uses the "string value" of cDateDuration.
     return oSelf.fsToString();
   def fsToString(oSelf):
     if oSelf.fbIsZero(): return "0d";

@@ -99,27 +99,27 @@
       return new cDate((int)$oDateTime->format("Y"), (int)$oDateTime->format("m"), (int)$oDateTime->format("d"));
     }
     
-    public static function fo0FromMYSQL($sDate) {
-      return is_null($sDate) ? null : cDate::foFromMYSQL($sDate);
-    }
-    public static function foFromMYSQL($sDate) {
-      // MYSQL happens to use the same serialization format as cDate does.
-      return cDate::foFromString($sDate);
-    }
-    public static function fo0FromMYSQLDateTime($sDateTime) {
-      return is_null($sDateTime) ? null : cDate::foFromMYSQLDateTime($sDateTime);
-    }
-    public static function foFromMYSQLDateTime($sDateTime) {
-      // MYSQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
-      return cDate::foFromString(explode(" ", $sDateTime)[0]);
-    }
-    
     public static function fo0FromJSON($sDate) {
       return is_null($sDate) ? null : cDate::foFromJSON($sDate);
     }
     public static function foFromJSON($sDate) {
       // JSON encoding uses the "string value" of cDate.
       return cDate::foFromString($sDate);
+    }
+    
+    public static function fo0FromMySQL($sDate) {
+      return is_null($sDate) ? null : cDate::foFromMySQL($sDate);
+    }
+    public static function foFromMySQL($sDate) {
+      // MySQL encoding uses the "string value" of cDate.
+      return cDate::foFromString($sDate);
+    }
+    public static function fo0FromMySQLDateTime($sDateTime) {
+      return is_null($sDateTime) ? null : cDate::foFromMySQLDateTime($sDateTime);
+    }
+    public static function foFromMySQLDateTime($sDateTime) {
+      // MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
+      return cDate::foFromString(explode(" ", $sDateTime)[0]);
     }
     
     public static function fbIsValidDateString($sDate) {
@@ -260,10 +260,12 @@
     public function foToPHPDateTimeUTC() {
       return new DateTime($this->fsToString() + "T0:0Z");
     }
-    public function fsToMYSQL() {
+    public function fxToJSON() {
+      // JSON encoding uses the "string value" of cDate.
       return $this->fsToString();
     }
-    public function fxToJSON() {
+    public function fsToMySQL() {
+      // MySQL encoding uses the "string value" of cDate.
       return $this->fsToString();
     }
     public function jsonSerialize() {

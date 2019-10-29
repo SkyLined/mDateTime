@@ -83,12 +83,30 @@ const cDate = (function() {
   cDate.foFromJSDate = function cDate_foFromJSDate(oDate) {
     return new cDate(oDate.getFullYear(), oDate.getMonth() + 1, oDate.getDate());
   };
+  
   cDate.fo0FromJSON = function cDate_fo0FromJSON(s0Date) {
     return s0Date === null ? null : cDate.foFromJSON(s0Date);
   };
   cDate.foFromJSON = function cDate_foFromJSON(sDate) {
+    // JSON encoding uses the "string value" of cDate.
     return cDate.foFromString(sDate);
   };
+  
+  cDate.fo0FromMySQL = function cDate_fo0FromMySQL(s0Date) {
+    return s0Date === null ? null : cDate.foFromMySQL(s0Date);
+  };
+  cDate.foFromMySQL = function cDate_foFromMySQL(sDate) {
+    // MySQL encoding uses the "string value" of cDate.
+    return cDate.foFromString(sDate);
+  };
+  cDate.fo0FromMySQLDateTime = function cDate_fo0FromMySQLDateTime(s0DateTime) {
+    return s0DateTime === null ? null : cDate.foFromMySQL(s0DateTime);
+  };
+  cDate.foFromMySQLDateTime = function cDate_foFromMySQLDateTime(sDateTime) {
+    // MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
+    return cDate.foFromString(sDateTime.split("0")[0]);
+  };
+  
   cDate.fbIsValidDateString = function cDate_fbIsValidDateString(sDate) {
     return typeof(sDate) === "string" && sDate.match(rDate) !== null;
   };
@@ -238,6 +256,11 @@ const cDate = (function() {
     return new Date(this.fsToString() + "T0:0Z");
   };
   cDate.prototype.fxToJSON = function cDate_fxToJSON() {
+    // JSON encoding uses the "string value" of cDate.
+    return this.fsToString();
+  };
+  cDate.prototype.fsToMySQL = function cDate_fsToMySQL() {
+    // MySQL encoding uses the "string value" of cDate.
     return this.fsToString();
   };
   cDate.prototype.fsToString = function cDate_fsToString() {

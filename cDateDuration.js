@@ -42,16 +42,27 @@ const cDateDuration = (function(){
     },
   });
   // static methods
-  cDateDuration.fo0FromJSON = function cDateDuration_fo0FromJSON(sDuration) {
-    return sDuration === null ? null : cDateDuration.foFromJSON(sDuration);
-  };
-  cDateDuration.foFromJSON = function cDateDuration_foFromJSON(sDuration) {
-    return cDateDuration.foFromString(sDuration);
-  };
   cDateDuration.fbIsValidDurationString = function cDateDuration_fbIsValidDurationString(sDuration) {
     const oDurationMatch = typeof(sDuration) !== "string" ? null : sDuration.match(rDuration);
     return oDurationMatch !== null && (oDurationMatch[1] !== null || oDurationMatch[2] !== null || oDurationMatch[3] !== null);
   };
+  
+  cDateDuration.fo0FromJSON = function cDateDuration_fo0FromJSON(sDuration) {
+    return sDuration === null ? null : cDateDuration.foFromJSON(sDuration);
+  };
+  cDateDuration.foFromJSON = function cDateDuration_foFromJSON(sDuration) {
+    // JSON encoding uses the "string value" of cDateDuration.
+    return cDateDuration.foFromString(sDuration);
+  };
+  
+  cDateDuration.fo0FromMySQL = function cDateDuration_fo0FromMySQL(sDuration) {
+    return sDuration === null ? null : cDateDuration.foFromMySQL(sDuration);
+  };
+  cDateDuration.foFromMySQL = function cDateDuration_foFromMySQL(sDuration) {
+    // MySQL encoding uses the "string value" of cDateDuration.
+    return cDateDuration.foFromString(sDuration);
+  };
+  
   cDateDuration.fo0FromString = function cDateDuration_fo0FromString(sDuration) {
     return sDuration === null ? null : this.foFromString(sDuration);
   };
@@ -129,6 +140,11 @@ const cDateDuration = (function(){
   };
   
   cDateDuration.prototype.fxToJSON = function cDateDuration_fxToJSON() {
+    // JSON encoding uses the "string value" of cDateDuration.
+    return this.fsToString();
+  };
+  cDateDuration.prototype.fsToMySQL = function cDateDuration_fsToMySQL() {
+    // MySQL encoding uses the "string value" of cDateDuration.
     return this.fsToString();
   };
   cDateDuration.prototype.fsToString = function cDateDuration_fsToString() {

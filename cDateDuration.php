@@ -51,27 +51,6 @@
       };
     }
     // static methods
-    public static function fo0FromPHPDateInterval($oDateInterval) {
-      return is_null($oDateInterval) ? null : cDateDuration::foFromPHPDateInterval($oDateInterval);
-    }
-    public static function foFromPHPDateInterval($oDateInterval) {
-      return new cDateDuration($oDateInterval->y, $oDateInterval->m, $oDateInterval->d);
-    }
-    
-    public static function fo0FromMYSQL($sDateDuration) {
-      return is_null($sDateDuration) ? null : cDateDuration::foFromMYSQL($sDateDuration);
-    }
-    public static function foFromMYSQL($sDateDuration) {
-      return cDateDuration::foFromString($sDateDuration); // MYSQL encoding uses the "string value" of cDateDuration.
-    }
-    
-    public static function fo0FromJSON($sDateDuration) {
-      return is_null($sDateDuration) ? null : cDate::foFromJSON($sDateDuration);
-    }
-    public static function foFromJSON($sDateDuration) {
-      return cDateDuration::foFromString($sDateDuration); // JSON encoding uses the "string value" of cDateDuration.
-    }
-    
     public static function fbIsValidDateDurationString($sDateDuration) {
       return (
         is_string($sDateDuration)
@@ -79,6 +58,30 @@
         && count($asMatch[1]) > 1
       );
     }
+    
+    public static function fo0FromPHPDateInterval($oDateInterval) {
+      return is_null($oDateInterval) ? null : cDateDuration::foFromPHPDateInterval($oDateInterval);
+    }
+    public static function foFromPHPDateInterval($oDateInterval) {
+      return new cDateDuration($oDateInterval->y, $oDateInterval->m, $oDateInterval->d);
+    }
+    
+    public static function fo0FromJSON($sDateDuration) {
+      return is_null($sDateDuration) ? null : cDate::foFromJSON($sDateDuration);
+    }
+    public static function foFromJSON($sDateDuration) {
+      // JSON encoding uses the "string value" of cDateDuration.
+      return cDateDuration::foFromString($sDateDuration);
+    }
+    
+    public static function fo0FromMySQL($sDateDuration) {
+      return is_null($sDateDuration) ? null : cDateDuration::foFromMySQL($sDateDuration);
+    }
+    public static function foFromMySQL($sDateDuration) {
+      // MySQL encoding uses the "string value" of cDateDuration.
+      return cDateDuration::foFromString($sDateDuration);
+    }
+    
     public static function fo0FromString($sDateDuration) {
       return is_null($sDateDuration) ? null : cDateDuration::foFromString($sDateDuration);
     }
@@ -167,6 +170,11 @@
     }
     
     public function fxToJSON() {
+      // JSON encoding uses the "string value" of cDateDuration.
+      return $this->fsToString();
+    }
+    public function fsToMySQL() {
+      // MySQL encoding uses the "string value" of cDateDuration.
       return $this->fsToString();
     }
     public function jsonSerialize() {

@@ -73,29 +73,50 @@ class cDate(object):
   @classmethod
   def foFromPyDate(cClass, oDate):
     return cClass(oDate.year, oDate.month, oDate.day);
+  
   @classmethod
   def fo0FromJSON(cClass, s0Date):
     return None if s0Date is None else cClass.foFromJSON(s0Date);
   @classmethod
   def foFromJSON(cClass, sDate):
+    # JSON encoding uses the "string value" of cDate.
     return cClass.foFromString(sDate);
+  
+  @classmethod
+  def fo0FromMySQL(cClass, s0Date):
+    return None if s0Date is None else cClass.foFromMySQL(s0Date);
+  @classmethod
+  def foFromMySQL(cClass, sDate):
+    # MySQL encoding uses the "string value" of cDate.
+    return cClass.foFromMySQL(sDate);
+  @classmethod
+  def fo0FromMySQLDateTime(cClass, s0DateTime):
+    return None if s0DateTime is None else cClass.foFromMySQLDateTime(s0DateTime);
+  @classmethod
+  def foFromMySQLDateTime(cClass, sDateTime):
+    # MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
+    return cClass.foFromMySQL(sDateTime.split(" ")[0]);
+  
   @staticmethod
   def fbIsValidDateString(sDate):
     return type(sDate) in [str, unicode] and rDate.match(sDate) is not None;
   @classmethod
   def fo0FromString(cClass, s0Date):
     return None if s0Date is None else cClass.foFromString(s0Date);
+  
   @classmethod
   def foFromString(cClass, sDate):
     oDateMatch = rDate.match(sDate) if type(sDate) in [str, unicode] else None;
     if oDateMatch is None: raise ValueError("Invalid date string " + repr(sDate) + ".");
     return cDate(long(oDateMatch.group(1)), long(oDateMatch.group(2)), long(oDateMatch.group(3)));
+  
   @classmethod
   def foNow(cClass):
     return cClass.foFromPyDate(datetime.datetime.now());
   @classmethod
   def foNowUTC(cClass):
     return cClass.foFromPyDate(datetime.datetime.utcnow());
+  
   #methods
   def foClone(oSelf):
     return oSelf.__class__(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
@@ -206,6 +227,10 @@ class cDate(object):
   def foToPyDate(oSelf):
     return datetime.date(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   def fxToJSON(oSelf):
+    # JSON encoding uses the "string value" of cDate.
+    return str(oSelf);
+  def fsToMySQL(oSelf):
+    # MySQL encoding uses the "string value" of cDate.
     return str(oSelf);
   def fsToString(oSelf):
     return fsGetDateString(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);

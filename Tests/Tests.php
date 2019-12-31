@@ -16,13 +16,19 @@
       throw new Exception($sErrorMessage);
     };
   };
-  function fDatePlustDurationMustEqual($sStartDate, $sDuration, $sEndDate, $sNormalizedDuration = NULL) {
+  function fDatePlusDurationMustEqual($sStartDate, $sDuration, $sHumanReadableDuration, $sEndDate, $sNormalizedDuration = NULL) {
     $oStartDate = cDate::foFromString($sStartDate);
     $oDuration = cDateDuration::foFromString($sDuration);
+    $sHumanReadableDuration = $oDuration->fsToHumanReadableString();
     $oEndDate = cDate::foFromString($sEndDate);
     $oCalculatedEndDate = $oStartDate->foGetEndDateForDuration($oDuration);
     $oCalculatedDuration = $oStartDate->foGetDurationForEndDate($oEndDate);
     $oNormalizedDuration = $oDuration->foNormalizedForDate($oStartDate);
+    if ($sHumanReadableDuration != $sExpectedHumanReadableDuration) {
+      throw new Exception(
+        "cDateDuration(" . $sDuration . ").fsToHumanReadableString() == " . $sHumanReadableDuration . " (NOT " . $sExpectedHumanReadableDuration . ")"
+      );
+    };
     fMustBeEqual(
       $oEndDate,
       $oCalculatedEndDate,
@@ -47,24 +53,24 @@
       $sDuration . " normalized for " . $sDate . " == " . (string)$oNormalizedDuration . " (NOT " . $sNormalizedDuration . ")"
     );
   };
-  fDatePlustDurationMustEqual("2000-01-01", "+1y", "2001-01-01");
-  fDatePlustDurationMustEqual("2000-01-01", "+12m", "2001-01-01");
-  fDatePlustDurationMustEqual("2000-01-01", "+366d", "2001-01-01"); // 2000 is a leap year.
-  fDatePlustDurationMustEqual("2001-01-01", "+1y", "2002-01-01");
-  fDatePlustDurationMustEqual("2001-01-01", "+12m", "2002-01-01");
-  fDatePlustDurationMustEqual("2001-01-01", "+365d", "2002-01-01"); // 2001 is not a leap year.
+  fDatePlusDurationMustEqual("2000-01-01", "+1y", "1 year", "2001-01-01");
+  fDatePlusDurationMustEqual("2000-01-01", "+12m", "12 months", "2001-01-01");
+  fDatePlusDurationMustEqual("2000-01-01", "+366d", "366 days", "2001-01-01"); // 2000 is a leap year.
+  fDatePlusDurationMustEqual("2001-01-01", "+1y", "1 year", "2002-01-01");
+  fDatePlusDurationMustEqual("2001-01-01", "+12m", "12 months", "2002-01-01");
+  fDatePlusDurationMustEqual("2001-01-01", "+365d", "365 days", "2002-01-01"); // 2001 is not a leap year.
   
-  fDatePlustDurationMustEqual("2000-02-01", "+28d", "2000-02-29"); // 2000 is a leap year.
-  fDatePlustDurationMustEqual("2000-02-01", "+29d", "2000-03-01"); // 2000 is a leap year.
-  fDatePlustDurationMustEqual("2001-02-01", "+28d", "2001-03-01"); // 2001 is not a leap year.
-  fDatePlustDurationMustEqual("2000-01-01", "+1y+1m+28d", "2001-03-01"); // 2001 is not a leap year; days are applied last.
+  fDatePlusDurationMustEqual("2000-02-01", "+28d", "28 days", "2000-02-29"); // 2000 is a leap year.
+  fDatePlusDurationMustEqual("2000-02-01", "+29d", "29 days", "2000-03-01"); // 2000 is a leap year.
+  fDatePlusDurationMustEqual("2001-02-01", "+28d", "28 days", "2001-03-01"); // 2001 is not a leap year.
+  fDatePlusDurationMustEqual("2000-01-01", "+1y+1m+28d", "1 year, 1 month, and 28 days", "2001-03-01"); // 2001 is not a leap year; days are applied last.
   
-  fDatePlustDurationMustEqual("2000-01-01", "+1m", "2000-02-01");
-  fDatePlustDurationMustEqual("2000-01-01", "+31d", "2000-02-01");
+  fDatePlusDurationMustEqual("2000-01-01", "+1m", "1 month", "2000-02-01");
+  fDatePlusDurationMustEqual("2000-01-01", "+31d", "31 days", "2000-02-01");
   
-  fDatePlustDurationMustEqual("2000-01-01", "+1d", "2000-01-02");
+  fDatePlusDurationMustEqual("2000-01-01", "+1d", "1 day", "2000-01-02");
   
-  fDatePlustDurationMustEqual("2000-01-01", "+1y1m1d", "2001-02-02");
+  fDatePlusDurationMustEqual("2000-01-01", "+1y1m1d", "1 year, 1 month, and 1 day", "2001-02-02");
   
   fNormalizedDurationForDateMustEqual("1y1m1d", "2000-01-01", "1y1m1d");
   fNormalizedDurationForDateMustEqual("+1y-1m+31d", "2000-01-01", "1y");
@@ -81,10 +87,10 @@
   fMustBeEqual($oTestDate, $oClonedTestDate, (string)$oTestDate . " should not be cloned as " . (string)$oClonedTestDate);
   
   // Check day/month is adjusted if needed when months are added to potentially overflow the day.
-  fDatePlustDurationMustEqual("2000-01-30", "1m", "2000-02-29", "30d");
-  fDatePlustDurationMustEqual("2001-01-30", "1m", "2001-02-28", "29d");
-  fDatePlustDurationMustEqual("2001-01-29", "1m", "2001-02-28", "30d");
-  fDatePlustDurationMustEqual("2001-01-28", "1m", "2001-02-28", "1m");
+  fDatePlusDurationMustEqual("2000-01-30", "1m", "1 month", "2000-02-29", "30d");
+  fDatePlusDurationMustEqual("2001-01-30", "1m", "1 month", "2001-02-28", "29d");
+  fDatePlusDurationMustEqual("2001-01-29", "1m", "1 month", "2001-02-28", "30d");
+  fDatePlusDurationMustEqual("2001-01-28", "1m", "1 month", "2001-02-28", "1m");
   
   $oTestDate->uDay = 29;
   $bHasThrownException = false;

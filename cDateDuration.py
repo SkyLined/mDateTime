@@ -115,9 +115,9 @@ class cDateDuration(object):
     # Show positive and negative durations the same.
     iYears = abs(oSelf.__iYears); iMonths = abs(oSelf.__iMonths); iDays = abs(oSelf.__iDays);
     asComponents = [sComponent for sComponent in [
-      "1 year" if iYears == 1 else "%d years" % iYears if iYears else "",
-      "1 month" if iMonths == 1 else "%d months" % iMonths if iMonths else "",
-      "1 day" if iDays == 1 else "%d days" % iDays if iDays else "",
+      "1 year" if iYears == 1 else ("%d years" % iYears if iYears else ""),
+      "1 month" if iMonths == 1 else ("%d months" % iMonths if iMonths else ""),
+      "1 day" if iDays == 1 else ("%d days" % iDays if iDays else ""),
     ] if sComponent]
     return (asComponents[0] + ", " + asComponents[1] + ", and " + asComponents[2]) \
         if len(asComponents) == 3 else " and ".join(asComponents);

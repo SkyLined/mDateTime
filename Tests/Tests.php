@@ -16,7 +16,7 @@
       throw new Exception($sErrorMessage);
     };
   };
-  function fDatePlusDurationMustEqual($sStartDate, $sDuration, $sHumanReadableDuration, $sEndDate, $sNormalizedDuration = NULL) {
+  function fDatePlusDurationMustEqual($sStartDate, $sDuration, $sExpectedHumanReadableDuration, $sEndDate, $sNormalizedDuration = NULL) {
     $oStartDate = cDate::foFromString($sStartDate);
     $oDuration = cDateDuration::foFromString($sDuration);
     $sHumanReadableDuration = $oDuration->fsToHumanReadableString();
@@ -165,5 +165,16 @@
   $o0MYSQLDate = cDate::fo0FromMYSQLDateTime("2000-01-01 01:02:03");
   fMustBeEqual($o0MYSQLDate, new cDate(2000, 1, 1), "cData::fo0FromMYSQLDateTime(\"2000-01-01 01:02:03\") should not result in " . (string)$o0MYSQLDate);
   
+  $oDateFrom = cDate::foFromString("2019-12-20");
+  $oDateCurrent = cDate::foFromString("2020-04-12");
+  $oDateTo = cDate::foFromString("2020-06-20");
+  if ($oDateCurrent->fbIsBefore($oDateFrom)) new Exception((string)$oDateCurrent . " should not be before " . (string)$oDateFrom . ".");
+  if ($oDateTo->fbIsBefore($oDateFrom)) new Exception((string)$oDateTo . " should not be before " . (string)$oDateFrom . ".");
+  if ($oDateTo->fbIsBefore($oDateCurrent)) new Exception((string)$oDateTo . " should not be before " . (string)$oDateCurrent . ".");
+  if ($oDateFrom->fbIsAfter($oDateCurrent)) new Exception((string)$oDateFrom . " should not be after " . (string)$oDateCurrent . ".");
+  if ($oDateFrom->fbIsAfter($oDateTo)) new Exception((string)$oDateFrom . " should not be after " . (string)$oDateTo . ".");
+  if ($oDateCurrent->fbIsAfter($oDateTo)) new Exception((string)$oDateCurrent . " should not be after " . (string)$oDateTo . ".");
+  if ($oDateFrom->fbIsInTheFuture()) new Exception((string)$oDateFrom . " should not be in the future.");
+  if ($oDateTo->fbIsInThePast()) new Exception((string)$oDateTo . " should not be in the past.");
   echo "All tests successful.";
 ?>

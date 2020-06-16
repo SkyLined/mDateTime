@@ -1,11 +1,13 @@
 import calendar, datetime, re;
 
 rDate = re.compile(
-  "^\\s*" +
-  "(\\d{4})" + "[\\-\\/]" +
-  "(\\d{1,2})" + "[\\-\\/]" + 
-  "(\\d{1,2})" +
-  "\\s*$"
+  r"^\s*" +
+  r"(\d{4})" +
+  r"[\-\/]" +
+  r"(\d{1,2})" +
+  r"[\-\/]" + 
+  r"(\d{1,2})" +
+  r"\s*$"
 );
 asMonths = [
   "January", "February", "March", "April", "May", "June",
@@ -17,115 +19,125 @@ asOrdinalPostfixes = [
   "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
   "st"                                                        # 31
 ];
-def fbIsValidYear(uYear):
-  return type(uYear) in [long, int, float] and uYear % 1 == 0;
-def fbIsValidMonth(uMonth):
-  return type(uMonth) in [long, int, float] and uMonth % 1 == 0 and uMonth >= 1 and uMonth <= 12;
-def fbIsValidDay(uDay):
-  return type(uDay) in [long, int, float] and uDay % 1 == 0 and uDay >= 1 and uDay <= 31;
-def fbIsValidDate(uYear, uMonth, uDay):
-  return type(uDay) in [long, int, float] and uMonth % 1 == 0 and uDay >= 1 and uDay <= fuGetLastDayInMonth0Based(uYear, uMonth - 1);
-def fsGetDateString(uYear, uMonth, uDay):
-  return "%04d-%02d-%02d" % (uYear, uMonth, uDay);
-
-def fuGetLastDayInMonth0Based(uYear, uMonth0Based):
-  return calendar.monthrange(uYear, uMonth0Based + 1)[1];
+def fbIsValidInteger(uValue, uMinValueInclusive = None, uMaxValueExclusive = None):
+  return (
+    (type(uValue) in [long, int, float])
+    and (uValue % 1 == 0)
+    and (uValue >= uMinValueInclusive if uMinValueInclusive is not None else True)
+    and (uValue < uMaxValueExclusive if uMaxValueExclusive is not None else True)
+  );
 
 class cDate(object):
-  # constructor
+  # Static methods
+  @staticmethod
+  def fbIsValidYear(uValue):
+    return fbIsValidInteger(uValue);
+  @staticmethod
+  def fbIsValidMonth(uValue):
+    return fbIsValidInteger(uValue, 1, 13);
+  @staticmethod
+  def fbIsValidDay(uValue):
+    return fbIsValidInteger(uValue, 1, 32); # We do not know the month but 32 is never valid.
+  @staticmethod
+  def fbIsValidDate(uYear, uMonth, uDay):
+    return (
+      cDate.fbIsValidYear(uYear)
+      and cDate.fbIsValidMonth(uMonth)
+      and fbIsValidInteger(uDay, 1, cDate.fuGetLastDayInMonth(uYear, uMonth) + 1)
+    );
+  @staticmethod
+  def fsGetDateString(uYear, uMonth, uDay):
+    return "%04d-%02d-%02d" % (uYear, uMonth, uDay);
+  @staticmethod
+  def fuGetLastDayInMonth(uYear, uMonth):
+    return calendar.monthrange(uYear, uMonth)[1];
+  
+  @staticmethod
+  def fo0FromPyDate(oDate):
+    return None if oDate is None else cDate.foFromPyDate(oDate);
+  @staticmethod
+  def foFromPyDate(oDate):
+    return cDate(oDate.year, oDate.month, oDate.day);
+  
+  @staticmethod
+  def fo0FromJSON(s0Date):
+    return None if s0Date is None else cDate.foFromJSON(s0Date);
+  @staticmethod
+  def foFromJSON(sDate):
+    # JSON encoding uses the "string value" of cDate.
+    return cDate.foFromString(sDate);
+  
+  @staticmethod
+  def fo0FromMySQL(s0Date):
+    return None if s0Date is None else cDate.foFromMySQL(s0Date);
+  @staticmethod
+  def foFromMySQL(sDate):
+    # MySQL encoding uses the "string value" of cDate.
+    return cDate.foFromMySQL(sDate);
+  @staticmethod
+  def fo0FromMySQLDateTime(s0DateTime):
+    return None if s0DateTime is None else cDate.foFromMySQLDateTime(s0DateTime);
+  @staticmethod
+  def foFromMySQLDateTime(sDateTime):
+    # MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
+    return cDate.foFromMySQL(sDateTime.split(" ")[0]);
+  
+  @staticmethod
+  def fbIsValidDateString(sDate):
+    return type(sDate) in [str, unicode] and rDate.match(sDate) is not None;
+  @staticmethod
+  def fo0FromString(s0Date):
+    return None if s0Date is None else cDate.foFromString(s0Date);
+  @staticmethod
+  def foFromString(sDate):
+    oDateMatch = rDate.match(sDate) if type(sDate) in [str, unicode] else None;
+    if oDateMatch is None: raise ValueError("Invalid date string " + repr(sDate) + ".");
+    return cDate(long(oDateMatch.group(1)), long(oDateMatch.group(2)), long(oDateMatch.group(3)));
+  
+  @staticmethod
+  def foNow():
+    return cDate.foFromPyDate(datetime.datetime.now());
+  @staticmethod
+  def foNowUTC():
+    return cDate.foFromPyDate(datetime.datetime.utcnow());
+  
+  # Constructor
   def __init__(oSelf, uYear, uMonth, uDay):
-    if not fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
-    if not fbIsValidMonth(uMonth): raise ValueError("Invalid month " + repr(uMonth) + ".");
-    if not fbIsValidDay(uDay): raise ValueError("Invalid day " + repr(uDay) + ".");
-    if not fbIsValidDate(uYear, uMonth, uDay): raise ValueError("Invalid date %s." % fsGetDateString(uYear, uMonth, uDay));
+    if not cDate.fbIsValidDate(uYear, uMonth, uDay): raise ValueError("Invalid date (%s, %s, %s)." % (repr(uYear), repr(uMonth), uDay));
     oSelf.__uYear = uYear;
     oSelf.__uMonth = uMonth; # 1 = January
     oSelf.__uDay = uDay; # 1 = first day of month
-  #properties
+  # Properties
   @property
   def uYear(oSelf):
     return oSelf.__uYear;
   @uYear.setter
   def uYear(oSelf, uYear):
-    if not fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
-    if not fbIsValidDate(uYear, oSelf.__uMonth, oSelf.__uDay): raise ValueError("Invalid year in date %s." % fsGetDateString(uYear, oSelf.__uMonth, oSelf.__uDay));
+    if not cDate.fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
+    if not cDate.fbIsValidDate(uYear, oSelf.__uMonth, oSelf.__uDay): raise ValueError("Invalid year in date %s." % cDate.fsGetDateString(uYear, oSelf.__uMonth, oSelf.__uDay));
     oSelf.__uYear = uYear;
   @property
   def uMonth(oSelf):
     return oSelf.__uMonth;
   @uMonth.setter
   def uMonth(oSelf, uMonth):
-    if not fbIsValidMonth(uMonth): raise ValueError("Invalid month " + repr(uMonth) + ".");
-    if not fbIsValidDate(oSelf.__uYear, uMonth, oSelf.__uDay): raise ValueError("Invalid month in date %s." % fsGetDateString(oSelf.__uYear, uMonth, oSelf.__uDay));
+    if not cDate.fbIsValidMonth(uMonth): raise ValueError("Invalid month " + repr(uMonth) + ".");
+    if not cDate.fbIsValidDate(oSelf.__uYear, uMonth, oSelf.__uDay): raise ValueError("Invalid month in date %s." % cDate.fsGetDateString(oSelf.__uYear, uMonth, oSelf.__uDay));
     oSelf.__uMonth = uMonth;
   @property
   def uDay(oSelf):
     return oSelf.__uDay;
   @uDay.setter
   def uDay(oSelf, uDay):
-    if not fbIsValidDay(uDay): raise ValueError("Invalid day " + repr(uDay) + ".");
-    if not fbIsValidDate(oSelf.__uYear, oSelf.__uMonth, uDay): raise ValueError("Invalid day in date %s." % fsGetDateString(uYear, uMonth, uDay));
+    if not cDate.fbIsValidDay(uDay): raise ValueError("Invalid day " + repr(uDay) + ".");
+    if not cDate.fbIsValidDate(oSelf.__uYear, oSelf.__uMonth, uDay): raise ValueError("Invalid day in date %s." % cDate.fsGetDateString(uYear, uMonth, uDay));
     oSelf.__uDay = uDay;
-  #static
-  @classmethod
-  def fo0FromPyDate(cClass, oDate):
-    return None if oDate is None else cClass.foFromJSDate(oDate);
-  @classmethod
-  def foFromPyDate(cClass, oDate):
-    return cClass(oDate.year, oDate.month, oDate.day);
-  
-  @classmethod
-  def fo0FromJSON(cClass, s0Date):
-    return None if s0Date is None else cClass.foFromJSON(s0Date);
-  @classmethod
-  def foFromJSON(cClass, sDate):
-    # JSON encoding uses the "string value" of cDate.
-    return cClass.foFromString(sDate);
-  
-  @classmethod
-  def fo0FromMySQL(cClass, s0Date):
-    return None if s0Date is None else cClass.foFromMySQL(s0Date);
-  @classmethod
-  def foFromMySQL(cClass, sDate):
-    # MySQL encoding uses the "string value" of cDate.
-    return cClass.foFromMySQL(sDate);
-  @classmethod
-  def fo0FromMySQLDateTime(cClass, s0DateTime):
-    return None if s0DateTime is None else cClass.foFromMySQLDateTime(s0DateTime);
-  @classmethod
-  def foFromMySQLDateTime(cClass, sDateTime):
-    # MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
-    return cClass.foFromMySQL(sDateTime.split(" ")[0]);
-  
-  @staticmethod
-  def fbIsValidDateString(sDate):
-    return type(sDate) in [str, unicode] and rDate.match(sDate) is not None;
-  @classmethod
-  def fo0FromString(cClass, s0Date):
-    return None if s0Date is None else cClass.foFromString(s0Date);
-  
-  @classmethod
-  def foFromString(cClass, sDate):
-    oDateMatch = rDate.match(sDate) if type(sDate) in [str, unicode] else None;
-    if oDateMatch is None: raise ValueError("Invalid date string " + repr(sDate) + ".");
-    return cDate(long(oDateMatch.group(1)), long(oDateMatch.group(2)), long(oDateMatch.group(3)));
-  
-  @classmethod
-  def foNow(cClass):
-    return cClass.foFromPyDate(datetime.datetime.now());
-  @classmethod
-  def foNowUTC(cClass):
-    return cClass.foFromPyDate(datetime.datetime.utcnow());
-  
   #methods
   def foClone(oSelf):
-    return oSelf.__class__(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
+    return cDate(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   
   def fSet(oSelf, uYear, uMonth, uDay):
-    if not fbIsValidYear(uYear): raise ValueError("Invalid year " + repr(uYear) + ".");
-    if not fbIsValidMonth(uMonth): raise ValueError("Invalid month " + repr(uMonth) + ".");
-    if not fbIsValidDay(uDay): raise ValueError("Invalid day " + repr(uDay) + ".");
-    if not fbIsValidDate(uYear, uMonth, uDay): raise ValueError("Invalid date " + fsGetDateString(uYear, uMonth, uDay) + ".");
+    if not cDate.fbIsValidDate(uYear, uMonth, uDay): raise ValueError("Invalid date (%s, %s, %s)." % (repr(uYear), repr(uMonth), uDay));
     oSelf.__uYear = uYear;
     oSelf.__uMonth = uMonth;
     oSelf.__uDay = uDay;
@@ -137,15 +149,15 @@ class cDate(object):
     uNewMonth0Based = oSelf.__uMonth - 1 + oDuration.iMonths;
     # If uNewMonth < 0 or > 11, convert the excess to years and add it.
     uNewYear += long(uNewMonth0Based / 12);
-    uNewMonth0Based = ((uNewMonth0Based % 12) + (12 if uNewMonth0Based < 0 else 0)) % 12;
+    uNewMonth = (((uNewMonth0Based % 12) + (12 if uNewMonth0Based < 0 else 0)) % 12) + 1;
     # If we added months and ended up in another month in which the current day does not exist (e.g. Feb 31st)
     # reduce the day (i.e. Feb 28th/29th)
-    uLastDayInNewMonth = fuGetLastDayInMonth0Based(uNewYear, uNewMonth0Based);
+    uLastDayInNewMonth = cDate.fuGetLastDayInMonth(uNewYear, uNewMonth);
     uNewDayInNewMonth = oSelf.__uDay if oSelf.uDay <= uLastDayInNewMonth else uLastDayInNewMonth;
     # Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
     # converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
-    oEndDate = oSelf.foFromPyDate(
-      datetime.date(uNewYear, (uNewMonth0Based + 1), uNewDayInNewMonth)
+    oEndDate = cDate.foFromPyDate(
+      datetime.date(uNewYear, uNewMonth, uNewDayInNewMonth)
       + datetime.timedelta(oDuration.iDays)
     );
     return oEndDate;
@@ -162,7 +174,7 @@ class cDate(object):
     uDurationMonths = oLastDate.uMonth - oFirstDate.uMonth;
     uDurationDays = oLastDate.uDay - oFirstDate.uDay;
     # The number of days in the last month various
-    uDaysInLastDatesPreviousMonth = fuGetLastDayInMonth0Based(oLastDate.uYear - (1 if oLastDate.uMonth == 1 else 0), ((oLastDate.uMonth + 10) % 12));
+    uDaysInLastDatesPreviousMonth = cDate.fuGetLastDayInMonth(oLastDate.uYear - (1 if oLastDate.uMonth == 1 else 0), ((oLastDate.uMonth + 10) % 12) + 1);
     if uDurationDays >= oLastDate.uDay:
       # If uDurationDays > last date's day, adding the days moved it into a new month; convert this into a month and adjust the days.
       # e.g. 2000-1-31 -> 2000-2-2 => -1m+29d (at this point) => +2d (after this adjustment)
@@ -205,17 +217,17 @@ class cDate(object):
     return False;
   
   def fbIsInThePast(oSelf):
-    return oSelf.fbIsBefore(oSelf.foNow());
+    return cDate.fbIsBefore(oSelf, cDate.foNow());
   def fbIsInThePastUTC(oSelf):
-    return oSelf.fbIsBefore(oSelf.foNowUTC());
+    return cDate.fbIsBefore(oSelf, cDate.foNowUTC());
   def fbIsToday(oSelf):
-    return oSelf.fbIsEqualTo(oSelf.foNow());
+    return cDate.fbIsEqualTo(oSelf, cDate.foNow());
   def fbIsTodayUTC(oSelf):
-    return oSelf.fbIsEqualTo(oSelf.foNowUTC());
+    return cDate.fbIsEqualTo(oSelf, cDate.foNowUTC());
   def fbIsInTheFuture(oSelf):
-    return oSelf.fbIsAfter(oSelf.foNow());
+    return cDate.fbIsAfter(oSelf, cDate.foNow());
   def fbIsInTheFutureUTC(oSelf):
-    return oSelf.fbIsAfter(oSelf.foNowUTC());
+    return cDate.fbIsAfter(oSelf, cDate.foNowUTC());
 
   def fsToHumanReadableString(oSelf):
     # Month <day>th, <year>
@@ -226,13 +238,23 @@ class cDate(object):
     );
   def foToPyDate(oSelf):
     return datetime.date(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
+  def fnToTimestamp(oSelf):
+    return time.mktime(cDate.foToPyDate(oSelf).timetuple()) + (oSelf.uMicrosecond / 1000.0 / 1000);
   def fxToJSON(oSelf):
     # JSON encoding uses the "string value" of cDate.
-    return str(oSelf);
+    return cDate.fsToString(oSelf);
   def fsToMySQL(oSelf):
     # MySQL encoding uses the "string value" of cDate.
-    return str(oSelf);
+    return cDate.fsToString(oSelf);
   def fsToString(oSelf):
-    return fsGetDateString(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
+    return cDate.fsGetDateString(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   def __str__(oSelf):
-    return oSelf.fsToString();
+    return cDate.fsToString(oSelf);
+  
+  def __cmp__(oSelf, oOther):
+    assert isinstance(oOther, cDate), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    if oSelf.uYear != oSelf.uYear: return oSelf.uYear - oOther.uYear;
+    if oSelf.uMonth != oSelf.uMonth: return oSelf.uMonth - oOther.uMonth;
+    if oSelf.uDay != oSelf.uDay: return oSelf.uDay - oOther.uDay;
+    return 0;

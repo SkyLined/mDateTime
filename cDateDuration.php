@@ -158,9 +158,9 @@
       // Show positive and negative durations the same.
       $iYears = abs($this->__iYears); $iMonths = abs($this->__iMonths); $iDays = abs($this->__iDays);
       $asComponents = array_filter([
-        $iYears == 1 ? "1 year" : $iYears ? (string)$iYears . " years" : "",
-        $iMonths == 1 ? "1 month" : $iMonths ? (string)$iMonths . " months" : "",
-        $iDays == 1 ? "1 day" : $iDays ? (string)$iDays . " days" : "",
+        ($iYears == 1 ? "1 year" : ($iYears ? (string)$iYears . " years" : "")),
+        ($iMonths == 1 ? "1 month" : ($iMonths ? (string)$iMonths . " months" : "")),
+        ($iDays == 1 ? "1 day" : ($iDays ? (string)$iDays . " days" : "")),
       ]);
       return (
         count($asComponents) == 3
@@ -183,9 +183,9 @@
     public function fsToString() {
       if ($this->fbIsZero()) return "0d";
       // months sign is required if months are negative, or months are positive and years are negative.
-      $sMonthsSign = ($this->__iMonths < 0 ? "-" : $this->__iYears < 0 ? "+" : "");
+      $sMonthsSign = ($this->__iMonths < 0 ? "-" : ($this->__iYears < 0 ? "+" : ""));
             // days sign is required if days are negative or days are positive and months are negative or if months are zero and years are negative.
-      $sDaysSign = ($this->__iDays < 0 ? "-" : $this->__iMonths < 0 || ($this->__iMonths == 0 && $this->__iYears < 0) ? "+" : "");
+      $sDaysSign = ($this->__iDays < 0 ? "-" : ($this->__iMonths < 0 || ($this->__iMonths == 0 && $this->__iYears < 0) ? "+" : ""));
       return implode("", [
         $this->__iYears ? $this->__iYears . "y" : "",
         $this->__iMonths ? $sMonthsSign . abs($this->__iMonths) . "m" : "",

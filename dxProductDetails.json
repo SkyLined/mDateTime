@@ -1,11 +1,15 @@
 {
-  "oProductVersion": "2020-06-17 11:06", 
+  "asDependentOnProductNames": [], 
+  "asOptionalProductNames": [], 
+  "oProductVersion": "2020-06-17 16:03", 
   "oRepository": {
     "sBranch": "master", 
     "sRepositoryName": "mDateTime", 
     "sType": "GitHub", 
     "sUserName": "SkyLined"
   }, 
+  "oTrialPeriodDuration": null, 
+  "sLicenseServerURL": null, 
   "sProductAuthor": "SkyLined", 
   "sProductName": "mDateTime", 
   "sProductURL": "https://github.com/SkyLined/mDateTime"

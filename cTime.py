@@ -84,7 +84,7 @@ class cTime(object):
       uHour += 12;
     uMinute = long(oTimeMatch.group(2) or 0);
     uSecond = long(oTimeMatch.group(3) or 0);
-    uMicrosecond = long(oTimeMatch.group(4) or 0);
+    uMicrosecond = long(oTimeMatch.group(4).ljust(6, "0")) if oTimeMatch.group(4) else 0;
     return cTime(uHour, uMinute, uSecond, uMicrosecond);
   
   @staticmethod

@@ -3,6 +3,8 @@ import calendar, datetime, re, time;
 from .cDate import cDate;
 from .cTime import cTime;
 
+rISO8601UTCDateTime = re.compile("^\s*(\d{4})\-?(\d\d)-?(\d\d)T(\d\d):?(\d\d):?(\d\d)(\.\d+)?(?:Z|\+00:00)\s*$", re.I);
+
 class cDateTime(cTime, cDate):
   # Static methods
   @staticmethod
@@ -43,7 +45,12 @@ class cDateTime(cTime, cDate):
   
   @staticmethod
   def fbIsValidDateTimeString(sDateTime):
-    tsDate_sTime = sDateTime.split(" ");
+    oISO8601UTCMatch = rISO8601UTCDateTime.match(sDateTime);
+    if oISO8601UTCMatch:
+      sYear, sMonth, sDay, sHour, sMinute, sSeconds, sFractionalSeconds = oISO8601UTCMatch.groups();
+      tsDate_sTime = ("%s-%s-%s" % (sYear, sMonth, sDay), "%s:%s:%s%s" % (sHour, sMinute, sSeconds, sFractionalSeconds or ""));
+    else:
+      tsDate_sTime = sDateTime.split(" ");
     return (
       len(tsDate_sTime) == 2
       and cDate.fbIsValidDateString(tsDate_sTime[0])
@@ -55,8 +62,13 @@ class cDateTime(cTime, cDate):
   
   @staticmethod
   def foFromString(sDateTime):
-    tsDate_sTime = sDateTime.split(" ");
-    if len(tsDate_sTime) != 2: raise ValueError("Invalid date+time string " + repr(sDateTime) + ".");
+    oISO8601UTCMatch = rISO8601UTCDateTime.match(sDateTime);
+    if oISO8601UTCMatch:
+      sYear, sMonth, sDay, sHour, sMinute, sSeconds, sFractionalSeconds = oISO8601UTCMatch.groups();
+      tsDate_sTime = ("%s-%s-%s" % (sYear, sMonth, sDay), "%s:%s:%s%s" % (sHour, sMinute, sSeconds, sFractionalSeconds or ""));
+    else:
+      tsDate_sTime = sDateTime.split(" ");
+      if len(tsDate_sTime) != 2: raise ValueError("Invalid date+time string " + repr(sDateTime) + ".");
     oDate = cDate.foFromString(tsDate_sTime[0]);
     oTime = cTime.foFromString(tsDate_sTime[1]);
     return cDateTime.foFromDateAndTime(oDate, oTime);
@@ -172,6 +184,8 @@ class cDateTime(cTime, cDate):
   def fsToMySQL(oSelf):
     # MySQL encoding uses the "string value" of cDateTime.
     return cDateTime.fsToString(oSelf);
+  def fsToISO8601UTC(oSelf):
+    return "%sT%sZ" % (cDate.fsToString(oSelf), cTime.fsToString(oSelf));
   def fsToString(oSelf):
     return "%s %s" % (cDate.fsToString(oSelf), cTime.fsToString(oSelf));
   
@@ -186,6 +200,3 @@ class cDateTime(cTime, cDate):
 from .cDateTimeDuration import cDateTimeDuration;
 from .cDateDuration import cDateDuration;
 from .cTimeDuration import cTimeDuration;
-
-
-

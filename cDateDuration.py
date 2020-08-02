@@ -121,7 +121,7 @@ class cDateDuration(object):
       return (iValueInRange, iOverflow);
     oSelf.iMonths, iOverflowedYears = ftxGetValueInRangeAndOverflow(oSelf.iMonths, 12);
     oSelf.iYears = oSelf.iYears + iOverflowedYears;
-    print "m->y: %s" % oSelf;
+#    print "m->y: %s" % oSelf;
     # Normalize signs ("1y,-1m" -> "11m")
     # We cannot do this for days, as the number of days in a month varies by month.
     iSignMultiplier = oSelf.__fiSignMultiplier();
@@ -134,7 +134,7 @@ class cDateDuration(object):
       );
     (oSelf.iMonths, iOverflowYears) = ftxGetCorrectlySignedValueInRangeAndOverflow(oSelf.iMonths, 12);
     oSelf.iYears += iOverflowYears;
-    print "+-m->y: %s" % oSelf;
+#    print "+-m->y: %s" % oSelf;
   def foNormalized(oSelf):
     oNormalized = oSelf.foClone();
     cDateDuration.fNormalize(oNormalized);

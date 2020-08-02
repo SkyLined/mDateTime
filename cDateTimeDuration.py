@@ -112,26 +112,27 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       iOverflow = (iValue - iValueInRange) / uMaxValue;
       return (iValueInRange, iOverflow);
     # Normalize time duration.
-    print "0: %s" % str(oSelf);
+#    print "-" * 80;
+#    print "0: %s" % str(oSelf);
     cTimeDuration.fNormalize(oSelf);
-    print "t: %s" % str(oSelf);
+#    print "t: %s" % str(oSelf);
     # Overflow hours into days
     (oSelf.iHours, iOverflowedDays) = ftxGetValueInRangeAndOverflow(oSelf.iHours, 24);
     oSelf.iDays += iOverflowedDays;
-    print "o: %s" % str(oSelf);
+#    print "o: %s" % str(oSelf);
     # Normalize date duration.
     cDateDuration.fNormalize(oSelf);
-    print "d: %s" % str(oSelf);
+#    print "d: %s" % str(oSelf);
     # Normalize sign for time if different from date.
     iDateSignMultiplier = oSelf.__fiDateSignMultiplier();
     iTimeSignMultiplier = oSelf.__fiTimeSignMultiplier();
-    if iDateSignMultiplier != iTimeSignMultiplier:
+    if iDateSignMultiplier * iTimeSignMultiplier < 0: # Neither is 0 and only 1 is < 0
       # Flow back from days into hours.
       oSelf.iHours += 24 * iDateSignMultiplier;
       oSelf.iDays += iTimeSignMultiplier;
       # Re-normalize time duration.
       cTimeDuration.fNormalize(oSelf);
-      print "+-: %s" % str(oSelf);
+#      print "+-: %s" % str(oSelf);
   def foNormalized(oSelf):
     oNormalized = cDateTimeDuration.foClone(oSelf);
     oNormalized.fNormalize();

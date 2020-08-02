@@ -13,7 +13,7 @@ try:
     oConsoleLock = threading.Lock();
     class oConsole(object):
       @staticmethod
-      def fOutput(*txArguments, *dxArguments):
+      def fOutput(*txArguments, **dxArguments):
         sOutput = "";
         for x in txArguments:
           if isinstance(x, (str, unicode)):
@@ -27,7 +27,7 @@ try:
         oConsoleLock.release();
       fPrint = fOutput;
       @staticmethod
-      def fStatus(*txArguments, *dxArguments):
+      def fStatus(*txArguments, **dxArguments):
         pass;
   
   #Import the test subject

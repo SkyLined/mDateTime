@@ -38,11 +38,22 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
   @staticmethod
   def foFromString(sDuration):
     tDuration_sDate_and_sTime = sDuration.split("/");
-    if len(tDuration_sDate_and_sTime) != 2:
-      raise ValueError("Invalid duration string " + repr(sDuration));
-    (sDateDuration, sTimeDuration) = tDuration_sDate_and_sTime;
-    oDateDuration = cDateDuration.foFromString(sDateDuration);
-    oTimeDuration = cTimeDuration.foFromString(sTimeDuration);
+    if len(tDuration_sDate_and_sTime) == 2:
+      (sDateDuration, sTimeDuration) = tDuration_sDate_and_sTime;
+      oDateDuration = cDateDuration.foFromString(sDateDuration);
+      oTimeDuration = cTimeDuration.foFromString(sTimeDuration);
+    else:
+      # It is either a date duration or a time duration; try to parse it as
+      # either:
+      try:
+        oDateDuration = cDateDuration.foFromString(sDuration);
+        oTimeDuration = cTimeDuration(0,0,0,0);
+      except:
+        try:
+          oTimeDuration = cTimeDuration.foFromString(sDuration);
+          oDateDuration = cDateDuration(0,0,0);
+        except:
+          raise ValueError("Invalid duration string " + repr(sDuration));
     return cDateTimeDuration(
       oDateDuration.iYears, oDateDuration.iMonths, oDateDuration.iDays,
       oTimeDuration.iHours, oTimeDuration.iMinutes, oTimeDuration.iSeconds, oTimeDuration.iMicroseconds
@@ -221,7 +232,10 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
     # MySQL encoding uses the "string value" of cDateDuration.
     return cDateTimeDuration.fsToString(oSelf);
   def fsToString(oSelf):
-    return "%s/%s" % (cDateDuration.fsToString(oSelf), cTimeDuration.fsToString(oSelf))
+    return "/".join([s for s in [
+      cDateDuration.fsToString(oSelf) if oSelf.__fiDateSignMultiplier() != 0 else None,
+      cTimeDuration.fsToString(oSelf) if oSelf.__fiTimeSignMultiplier() != 0 else None,
+    ] if s]);
   def __str__(oSelf):
     return cDateTimeDuration.fsToString(oSelf);
   

@@ -59,10 +59,22 @@ def fTestDateTime():
   fDateTimePlusDurationMustEqual("2001-01-01 21:01:01", "+13m/+61m",    "13 months and 61 minutes",   "2002-02-01 22:02:01",  "+1y+1m/+1h+1m",   "1 year, 1 month, 1 hour, and 1 minute");
   fDateTimePlusDurationMustEqual("2001-01-01 21:01:01", "+397d/+3661s", "397 days and 3661 seconds",  "2002-02-02 22:02:02",  "+1y+1m+1d/+1h+1m+1s", "1 year, 1 month, 1 day, 1 hour, 1 minute, and 1 second");
   fDateTimePlusDurationMustEqual("2000-01-01 20:01:01", "+12m+32d/+23h+59m+59s", "12 months, 32 days, 23 hours, 59 minutes, and 59 seconds", \
-                                                                                                      "2001-02-03 20:01:00",  "+1y+1m/+23h+59m+59s");
+                                                                                                      "2001-02-03 20:01:00",  "+1y+1m+1d/+23h+59m+59s", "1 year, 1 month, 1 day, 23 hours, 59 minutes, and 59 seconds");
   fDateTimePlusDurationMustEqual("2000-12-31 23:59:59.999999", "+1u",   "1 microsecond",              "2001-01-01 00:00:00");
   
-  fDateNormalizedDurationMustEqual("1y1m1d/1h1m1s1u", "+1y+1m+1d/+1h+1m+1s+1u");
-  fDateNormalizedDurationMustEqual("1y+12m+366d/+20h+60m+3600s+3600000000u", "+2y+367d/0s");
+  sDateTime = "2000-01-02 03:04:05.06";
+  oDateTime = mDateTime.cDateTime.foFromString(sDateTime);
+  assert str(oDateTime) == sDateTime, \
+      "str(cDateTime.foFromString(%s)) == %s !?" % (repr(sDateTime), str(oDateTime));
+  
+  sISO8601UTCDateTime = "2000-01-02T03:04:05.06Z";
+  oISO8601UTCDateTime = mDateTime.cDateTime.foFromString(sISO8601UTCDateTime);
+  assert oISO8601UTCDateTime.fsToISO8601UTC() == sISO8601UTCDateTime, \
+      "cDateTime.foFromString(%s).fsToISO8601UTC() == %s !?" % (repr(sISO8601UTCDateTime), oISO8601UTCDateTime.fsToISO8601UTC());
+  assert str(oDateTime) == str(oISO8601UTCDateTime), \
+      "cDateTime.foFromString(%s) == %s (NOT %s)" % (sDateTime, str(oDateTime), str(oISO8601UTCDateTime));
+  
+  fNormalizedDurationMustEqual("1y1m1d/1h1m1s1u", "+1y+1m+1d/+1h+1m+1s+1u");
+  fNormalizedDurationMustEqual("1y+12m+366d/+21h+60m+3600s+3600000000u", "+2y+367d/0s");
   
   print "    + All tests successful.";

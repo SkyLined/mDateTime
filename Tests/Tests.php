@@ -176,5 +176,5 @@
   if ($oDateCurrent->fbIsAfter($oDateTo)) new Exception((string)$oDateCurrent . " should not be after " . (string)$oDateTo . ".");
   if ($oDateFrom->fbIsInTheFuture()) new Exception((string)$oDateFrom . " should not be in the future.");
   if ($oDateTo->fbIsInThePast()) new Exception((string)$oDateTo . " should not be in the past.");
-  echo "All tests successful.";
+  echo "+ All tests successful.\n";
 ?>

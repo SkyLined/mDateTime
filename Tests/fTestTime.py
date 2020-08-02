@@ -65,6 +65,8 @@ def fTestTime():
                                                                       "21:01:00");
   fTimePlusDurationMustEqual("20:01:01", "+1u",     "1 microsecond",  "20:01:01.000001");
   fTimePlusDurationMustEqual("20:01:01", "+1000u",  "1 millisecond",  "20:01:01.001");
+  fTimePlusDurationMustEqual("20:01:01.01", "+101u", "101 microseconds", \
+                                                                      "20:01:01.010101");
   fTimePlusDurationMustEqual("20:01:01.001001", "+1001u", "1 millisecond and 1 microsecond", \
                                                                       "20:01:01.002002");
   fTimePlusDurationMustEqual("20:01:01.000001", "+999999u", "999 milliseconds and 999 microseconds", \

@@ -64,6 +64,26 @@ EXIT /B 0
   CALL %PHP% "%~dp0\Tests\Tests.php" %*
   ENDLOCAL & EXIT /B %ERRORLEVEL%
 
+:TEST_NODE
+  REM CURRENTLY NOT IMPLEMENTED - You can load the Tests.html file in a browser
+  REM to test the JavaScript implementation
+  ECHO * Testing NODE not implemented yet.
+  EXIT /B 0
+  IF NOT DEFINED NODE (
+    REM Try to detect the location of PHP automatically
+    FOR /F "usebackq delims=" %%I IN (`where "node" 2^>nul`) DO (
+      SET NODE="%%~I"
+      GOTO :FOUND_NODE
+    )
+    ECHO - Cannot find node.exe.
+    ENDLOCAL
+    IF NOT "%~1" == "IGNORE" EXIT /B 1
+    EXIT /B 0
+  )
+:FOUND_NODE
+  ECHO * Testing NODE...
+  CALL %NODE% "%~dp0\Tests\Tests.js" %*
+  ENDLOCAL & EXIT /B %ERRORLEVEL%
 
 :ERROR
   ECHO - Error %ERRORLEVEL%!

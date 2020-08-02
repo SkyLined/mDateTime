@@ -6,6 +6,16 @@ from .cTime import cTime;
 class cDateTime(cTime, cDate):
   # Static methods
   @staticmethod
+  def foFromTimestamp(nTimestamp):
+    uTimestamp = long(nTimestamp);
+    oStructTime = time.localtime(uTimestamp);
+    uMicroseconds = long((nTimestamp - uTimestamp) * 1000 * 1000);
+    return cDateTime(
+      oStructTime.tm_year, oStructTime.tm_mon, oStructTime.tm_mday,
+      oStructTime.tm_hour, oStructTime.tm_min, oStructTime.tm_sec, uMicroseconds
+    );
+  
+  @staticmethod
   def fo0FromPyDateTime(oDateTime):
     return None if oDateTime is None else cDateTime.foFromPyDateTime(oDateTime);
   @staticmethod

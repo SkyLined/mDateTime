@@ -1,4 +1,8 @@
 {
+  "asProductTypes": ["JavaScript module", "PHP module", "Python module"],
+  "sPythonModuleName": "mDateTime",
+  "asPHPModuleNames": ["cDate", "cDateDuration"],
+  "asJavaScriptModuleNames": ["cDate", "cDateDuration"],
   "asDependentOnProductNames": [], 
   "asOptionalProductNames": [], 
   "oProductVersion": "2020-08-12 11:47", 

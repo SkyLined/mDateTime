@@ -1,11 +1,21 @@
 {
-  "asProductTypes": ["JavaScript module", "PHP module", "Python module"],
-  "sPythonModuleName": "mDateTime",
-  "asPHPModuleNames": ["cDate", "cDateDuration"],
-  "asJavaScriptModuleNames": ["cDate", "cDateDuration"],
   "asDependentOnProductNames": [], 
+  "asJavaScriptModuleNames": [
+    "cDate", 
+    "cDateDuration"
+  ], 
   "asOptionalProductNames": [], 
-  "oProductVersion": "2020-08-12 11:47", 
+  "asPHPModuleNames": [
+    "cDate", 
+    "cDateDuration"
+  ], 
+  "asProductTypes": [
+    "JavaScript module", 
+    "PHP module", 
+    "Python module"
+  ], 
+  "asPythonApplicationNames": [], 
+  "oProductVersion": "2021-03-01 09:14", 
   "oRepository": {
     "sBranch": "master", 
     "sRepositoryName": "mDateTime", 
@@ -16,5 +26,6 @@
   "sLicenseServerURL": null, 
   "sProductAuthor": "SkyLined", 
   "sProductName": "mDateTime", 
-  "sProductURL": "https://github.com/SkyLined/mDateTime"
+  "sProductURL": "https://github.com/SkyLined/mDateTime", 
+  "sPythonModuleName": "mDateTime"
 }

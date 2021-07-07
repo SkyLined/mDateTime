@@ -51,7 +51,7 @@ def fNormalizedDurationMustEqual(sDuration, sNormalizedDuration):
   );
 
 def fTestDateTime():
-  print "  * Testing cDateTime/cDateTimeDuration...";
+  print("  * Testing cDateTime/cDateTimeDuration...");
   fDateTimePlusDurationMustEqual("2000-01-01 20:01:01", "+1y/+1h",      "1 year and 1 hour",          "2001-01-01 21:01:01");
   fDateTimePlusDurationMustEqual("2000-01-01 20:01:01", "+12m/+60m",    "12 months and 60 minutes",   "2001-01-01 21:01:01",  "+1y/+1h",         "1 year and 1 hour");
   fDateTimePlusDurationMustEqual("2000-01-01 20:01:01", "+366d/+3600s", "366 days and 3600 seconds",  "2001-01-01 21:01:01",  "+1y/+1h",         "1 year and 1 hour");
@@ -77,4 +77,4 @@ def fTestDateTime():
   fNormalizedDurationMustEqual("1y1m1d/1h1m1s1u", "+1y+1m+1d/+1h+1m+1s+1u");
   fNormalizedDurationMustEqual("1y+12m+366d/+21h+60m+3600s+3600000000u", "+2y+367d/0s");
   
-  print "    + All tests successful.";
+  print("    + All tests successful.");

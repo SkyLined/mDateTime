@@ -43,7 +43,7 @@ def fNormalizedDurationForDateMustEqual(sDuration, sDate, sNormalizedDuration):
   );
 
 def fTestDate():
-  print "  * Testing cDate/cDateDuration...";
+  print("  * Testing cDate/cDateDuration...");
   fDatePlusDurationMustEqual("2000-01-01", "+1y",   "1 year",     "2001-01-01");
   fDatePlusDurationMustEqual("2000-01-01", "+12m",  "12 months",  "2001-01-01");
   fDatePlusDurationMustEqual("2000-01-01", "+366d", "366 days",   "2001-01-01"); # 2000 is a leap year.
@@ -145,4 +145,4 @@ def fTestDate():
   fCompareDates(oDate4, "IsAfter", oDate3);  
   fCompareDates(oDate4, "IsEqualTo", oDate4);  
 
-  print "    + All tests successful.";
+  print("    + All tests successful.");

@@ -1,4 +1,6 @@
-import calendar, datetime, re;
+import calendar, datetime, math, re;
+
+gbDebugOutput = False;
 
 rDate = re.compile(
   r"^\s*" +
@@ -21,7 +23,7 @@ asOrdinalPostfixes = [
 ];
 def fbIsValidInteger(uValue, uMinValueInclusive = None, uMaxValueExclusive = None):
   return (
-    (type(uValue) in [long, int, float])
+    isinstance(uValue, int)
     and (uValue % 1 == 0)
     and (uValue >= uMinValueInclusive if uMinValueInclusive is not None else True)
     and (uValue < uMaxValueExclusive if uMaxValueExclusive is not None else True)
@@ -31,7 +33,7 @@ class cDate(object):
   # Static methods
   @staticmethod
   def fbIsValidYear(uValue):
-    return fbIsValidInteger(uValue);
+    return fbIsValidInteger(uValue, 0);
   @staticmethod
   def fbIsValidMonth(uValue):
     return fbIsValidInteger(uValue, 1, 13);
@@ -84,15 +86,15 @@ class cDate(object):
   
   @staticmethod
   def fbIsValidDateString(sDate):
-    return type(sDate) in [str, unicode] and rDate.match(sDate) is not None;
+    return isinstance(sDate, str) and rDate.match(sDate) is not None;
   @staticmethod
   def fo0FromString(s0Date):
     return None if s0Date is None else cDate.foFromString(s0Date);
   @staticmethod
   def foFromString(sDate):
-    oDateMatch = rDate.match(sDate) if type(sDate) in [str, unicode] else None;
+    oDateMatch = rDate.match(sDate) if isinstance(sDate, str) else None;
     if oDateMatch is None: raise ValueError("Invalid date string " + repr(sDate) + ".");
-    return cDate(long(oDateMatch.group(1)), long(oDateMatch.group(2)), long(oDateMatch.group(3)));
+    return cDate(int(oDateMatch.group(1)), int(oDateMatch.group(2)), int(oDateMatch.group(3)));
   
   @staticmethod
   def foNow():
@@ -145,15 +147,31 @@ class cDate(object):
   def foGetEndDateForDuration(oSelf, oDuration):
     # Note that this code ignores the time (if any) in oDuration
     # Add the year and month:
-    uNewYear = oSelf.__uYear + oDuration.iYears;
-    uNewMonth0Based = oSelf.__uMonth - 1 + oDuration.iMonths;
-    # If uNewMonth < 0 or > 11, convert the excess to years and add it.
-    uNewYear += long(uNewMonth0Based / 12);
-    uNewMonth = (((uNewMonth0Based % 12) + (12 if uNewMonth0Based < 0 else 0)) % 12) + 1;
+    iNewYear = oSelf.__uYear + oDuration.iYears;
+    iNewMonth0Based = oSelf.__uMonth - 1 + oDuration.iMonths;
+    if gbDebugOutput: print("year %s %s %s => %s, month (base 0) %s %s %s => %s" % (
+      repr(oSelf.__uYear), "-" if oDuration.iYears < 0 else "+", abs(oDuration.iYears), repr(iNewYear),
+      repr(oSelf.__uMonth - 1), "-" if oDuration.iMonths < 0 else "+", abs(oDuration.iMonths), repr(iNewMonth0Based),
+    ));
+    # If uNewMonth < 0 or > 11, convert the excess/shortage to years and add it.
+    iMonthsExcessOrShortageInYears = math.floor(iNewMonth0Based / 12);
+    iNewYear += iMonthsExcessOrShortageInYears;
+    assert iNewYear > 0, \
+        "Year cannot be < 0 (%s)" % iNewYear;
+    uNewYear = iNewYear;
+    uNewMonth0Based = iNewMonth0Based % 12;
+    uNewMonth = uNewMonth0Based + 1;
+    if gbDebugOutput: print("year %s= %s => %s, month (base 0) %s => %s => base 1: %s" % (
+      "-" if iMonthsExcessOrShortageInYears < 0 else "+", abs(iMonthsExcessOrShortageInYears), repr(uNewYear),
+      repr(iNewMonth0Based), repr(uNewMonth0Based), repr(uNewMonth),
+    ));
     # If we added months and ended up in another month in which the current day does not exist (e.g. Feb 31st)
     # reduce the day (i.e. Feb 28th/29th)
     uLastDayInNewMonth = cDate.fuGetLastDayInMonth(uNewYear, uNewMonth);
     uNewDayInNewMonth = oSelf.__uDay if oSelf.uDay <= uLastDayInNewMonth else uLastDayInNewMonth;
+    if gbDebugOutput and uNewDayInNewMonth != oSelf.__uDay: print("day %d => %d" % (
+      oSelf.__uDay, uNewDayInNewMonth
+    ));
     # Add the days by creating the Python datetime.date equivalent and adding the days using datetime.timedelta, then
     # converting back to cDate. This allows us to reuse the Python API for tracking the number of days in each month.
     oEndDate = cDate.foFromPyDate(
@@ -187,9 +205,9 @@ class cDate(object):
       uDurationDays += uDaysInLastDatesPreviousMonth;
     # If uDurationMonths < 0 or >= 12, convert the excess to years and add them.
     if uDurationMonths < 0 or uDurationMonths >= 12:
-      uDurationYears += long(uDurationMonths / 12) + (-1 if uDurationMonths < 0 else 0);
+      uDurationYears += int(uDurationMonths / 12) + (-1 if uDurationMonths < 0 else 0);
       uDurationMonths = (uDurationMonths % 12) + (12 if uDurationMonths < 0 else 0);
-    from cDateDuration import cDateDuration;
+    from .cDateDuration import cDateDuration;
     oDuration = cDateDuration(
       uDurationYears * uDurationMultiplier,
       uDurationMonths * uDurationMultiplier,

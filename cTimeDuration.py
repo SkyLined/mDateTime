@@ -9,7 +9,7 @@ rTimeDuration = re.compile(
   r"\s*$"
 );
 def fbIsValidInteger(uValue):
-  return type(uValue) in [long, int, float] and uValue % 1 == 0;
+  return isinstance(uValue, (int, float)) and uValue % 1 == 0;
 
 class cTimeDuration(object):
   # static methods
@@ -31,21 +31,21 @@ class cTimeDuration(object):
   
   @staticmethod
   def fbIsValidDurationString(sDuration):
-    oDurationMatch = rTimeDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
+    oDurationMatch = rTimeDuration.match(sDuration) if isinstance(sDuration, str) else None;
     return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);
   @staticmethod
   def fo0FromString(sDuration):
     return None if sDuration is None else cTimeDuration.foFromString(sDuration);
   @staticmethod
   def foFromString(sDuration):
-    oDurationMatch = rTimeDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
+    oDurationMatch = rTimeDuration.match(sDuration) if isinstance(sDuration, str) else None;
     if oDurationMatch is None or all([sComponent is None for sComponent in oDurationMatch.groups()]):
       raise ValueError("Invalid duration string " + repr(sDuration));
     sHours, sMinutes, sSeconds, sMicroseconds = oDurationMatch.groups();
-    iHours = long(sHours) if sHours else 0;
-    iMinutes = long(sMinutes) if sMinutes else 0;
-    iSeconds = long(sSeconds) if sSeconds else 0;
-    iMicroseconds = long(sMicroseconds) if sMicroseconds else 0;
+    iHours = int(sHours) if sHours else 0;
+    iMinutes = int(sMinutes) if sMinutes else 0;
+    iSeconds = int(sSeconds) if sSeconds else 0;
+    iMicroseconds = int(sMicroseconds) if sMicroseconds else 0;
     return cTimeDuration(iHours, iMinutes, iSeconds, iMicroseconds);
   # Constructor
   def __init__(oSelf, iHours, iMinutes, iSeconds, iMicroseconds):

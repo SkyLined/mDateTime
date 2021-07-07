@@ -9,9 +9,9 @@ class cDateTime(cTime, cDate):
   # Static methods
   @staticmethod
   def foFromTimestamp(nTimestamp):
-    uTimestamp = long(nTimestamp);
+    uTimestamp = int(nTimestamp);
     oStructTime = time.localtime(uTimestamp);
-    uMicroseconds = long((nTimestamp - uTimestamp) * 1000 * 1000);
+    uMicroseconds = int((nTimestamp - uTimestamp) * 1000 * 1000);
     return cDateTime(
       oStructTime.tm_year, oStructTime.tm_mon, oStructTime.tm_mday,
       oStructTime.tm_hour, oStructTime.tm_min, oStructTime.tm_sec, uMicroseconds
@@ -108,9 +108,9 @@ class cDateTime(cTime, cDate):
     return cTime(oSelf.uHour, oSelf.uMinute, oSelf.uSecond, oSelf.uMicrosecond);
   
   def foGetEndDateTimeForDuration(oSelf, oDuration):
-    from cDateDuration import cDateDuration;
-    from cTimeDuration import cTimeDuration;
-    from cDateTimeDuration import cDateTimeDuration;
+    from .cDateDuration import cDateDuration;
+    from .cTimeDuration import cTimeDuration;
+    from .cDateTimeDuration import cDateTimeDuration;
     if isinstance(oDuration, cDateTimeDuration):
       oDateDuration = oTimeDuration = oDuration;
     elif isinstance(oDuration, cDateDuration):
@@ -176,7 +176,7 @@ class cDateTime(cTime, cDate):
   def fnToTimestamp(oSelf):
     return time.mktime(cDateTime.foToPyDateTime(oSelf).timetuple()) + (oSelf.uMicrosecond / 1000.0 / 1000);
   def fuToTimestamp(oSelf):
-    return long(time.mktime(cDateTime.foToPyDateTime(oSelf).timetuple()));
+    return int(time.mktime(cDateTime.foToPyDateTime(oSelf).timetuple()));
   
   def fxToJSON(oSelf):
     # JSON encoding uses the "string value" of cDateTime.

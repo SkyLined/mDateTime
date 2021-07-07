@@ -1,4 +1,6 @@
-import re;
+import math, re;
+
+gbDebugOutput = False;
 
 rDateDuration = re.compile(
   "^\\s*" +
@@ -8,7 +10,7 @@ rDateDuration = re.compile(
   "\\s*$"
 );
 def fbIsValidInteger(uValue):
-  return type(uValue) in [long, int, float] and uValue % 1 == 0;
+  return isinstance(uValue, (int, float)) and uValue % 1 == 0;
 
 class cDateDuration(object):
   # static methods
@@ -30,23 +32,23 @@ class cDateDuration(object):
   
   @staticmethod
   def fbIsValidDurationString(sDuration):
-    oDurationMatch = rDateDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
+    oDurationMatch = rDateDuration.match(sDuration) if isinstance(sDuration, str) else None;
     return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);
   @staticmethod
   def fo0FromString(sDuration):
     return None if sDuration is None else cDateDuration.foFromString(sDuration);
   @staticmethod
   def foFromString(sDuration):
-    oDurationMatch = rDateDuration.match(sDuration) if type(sDuration) in [str, unicode] else None;
+    oDurationMatch = rDateDuration.match(sDuration) if isinstance(sDuration, str) else None;
     asDurationMatchGroups = oDurationMatch.groups() if oDurationMatch is not None else None
     if oDurationMatch is None or all([sComponent is None for sComponent in asDurationMatchGroups]):
       raise ValueError("Invalid duration string " + repr(sDuration));
     sYears, sMonths, sDays = oDurationMatch.groups();
     # Values may not contain a sign, in which case the sign is assumed to be +
     # "-1y2m+3d" => "-1y+2m+3d"
-    iYears = long(sYears) if sYears else 0;
-    iMonths = long(sMonths) if sMonths else 0;
-    iDays = long(sDays) if sDays else 0;
+    iYears = int(sYears) if sYears else 0;
+    iMonths = int(sMonths) if sMonths else 0;
+    iDays = int(sDays) if sDays else 0;
     return cDateDuration(iYears, iMonths, iDays);
   # Constructor
   def __init__(oSelf, iYears, iMonths, iDays):
@@ -117,11 +119,11 @@ class cDateDuration(object):
     # We cannot do this for days, as the number of days in a month varies by month.
     def ftxGetValueInRangeAndOverflow(iValue, uMaxValue):
       iValueInRange = iValue % uMaxValue;
-      iOverflow = (iValue - iValueInRange) / uMaxValue;
+      iOverflow = math.floor((iValue - iValueInRange) / uMaxValue);
       return (iValueInRange, iOverflow);
     oSelf.iMonths, iOverflowedYears = ftxGetValueInRangeAndOverflow(oSelf.iMonths, 12);
     oSelf.iYears = oSelf.iYears + iOverflowedYears;
-#    print "m->y: %s" % oSelf;
+    if gbDebugOutput: print("m->y: %s" % oSelf);
     # Normalize signs ("1y,-1m" -> "11m")
     # We cannot do this for days, as the number of days in a month varies by month.
     iSignMultiplier = oSelf.__fiSignMultiplier();
@@ -134,7 +136,7 @@ class cDateDuration(object):
       );
     (oSelf.iMonths, iOverflowYears) = ftxGetCorrectlySignedValueInRangeAndOverflow(oSelf.iMonths, 12);
     oSelf.iYears += iOverflowYears;
-#    print "+-m->y: %s" % oSelf;
+    if gbDebugOutput: print("+-m->y: %s" % oSelf);
   def foNormalized(oSelf):
     oNormalized = oSelf.foClone();
     cDateDuration.fNormalize(oNormalized);
@@ -142,7 +144,11 @@ class cDateDuration(object):
   def foNormalizedForDate(oSelf, oDate):
     # Adjust duration to make all numbers either all positive or negative and minimize days, months and years.
     # e.g. "+2y-12m+32d" for "2000-01-01" => "+1y+1m+1d"
-    return cDate.foGetDurationForEndDate(oDate, cDate.foGetEndDateForDuration(oDate, oSelf));
+    oEndDate = cDate.foGetEndDateForDuration(oDate, oSelf);
+    if gbDebugOutput: print("%s + %s == %s" % (oDate, oSelf, oEndDate));
+    oNormalizedDuration = cDate.foGetDurationForEndDate(oDate, oEndDate);
+    if gbDebugOutput: print("%s == %s + %s" % (oEndDate, oDate, oNormalizedDuration));
+    return oNormalizedDuration;
   def fnToSecondsForDate(oSelf, oDate):
     oEndDate = oDate.foGetEndDateForDuration(oSelf);
     return oEndDate.fnToTimestamp() - oDate.fnToTimestamp();

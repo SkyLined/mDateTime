@@ -1,31 +1,35 @@
 {
-  "asDependentOnProductNames": [], 
-  "asJavaScriptModuleNames": [
-    "cDate", 
+  "a0sDebugAdditionalProductNames": [
+    "mFileSystemItem",
+    "mDebugOutput",
+    "mNotProvided",
+    "mWindowsSDK",
+    "mConsole"
+  ],
+  "a0sJavaScriptModuleNames": [
+    "cDate",
     "cDateDuration"
-  ], 
-  "asOptionalProductNames": [], 
-  "asPHPModuleNames": [
-    "cDate", 
+  ],
+  "a0sPHPModuleNames": [
+    "cDate",
     "cDateDuration"
-  ], 
+  ],
   "asProductTypes": [
-    "JavaScript module", 
-    "PHP module", 
+    "JavaScript module",
+    "PHP module",
     "Python module"
-  ], 
-  "asPythonApplicationNames": [], 
-  "oProductVersion": "2021-03-01 09:14", 
-  "oRepository": {
-    "sBranch": "master", 
-    "sRepositoryName": "mDateTime", 
-    "sType": "GitHub", 
-    "sUserName": "SkyLined"
-  }, 
-  "oTrialPeriodDuration": null, 
-  "sLicenseServerURL": null, 
-  "sProductAuthor": "SkyLined", 
-  "sProductName": "mDateTime", 
-  "sProductURL": "https://github.com/SkyLined/mDateTime", 
-  "sPythonModuleName": "mDateTime"
+  ],
+  "o0Repository": {
+    "sStructureVersion": "2021-07-02 11:16",
+    "sType": "GitHub",
+    "sbBranch": "master",
+    "sbRepositoryName": "mDateTime",
+    "sbUserName": "SkyLined"
+  },
+  "oProductVersion": "2021-07-07 12:47",
+  "s0PythonModuleName": "mDateTime",
+  "sProductAuthor": "SkyLined",
+  "sProductName": "mDateTime",
+  "sStructureVersion": "2021-07-02 11:16",
+  "sb0ProductURL": "https://github.com/SkyLined/mDateTime"
 }

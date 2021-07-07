@@ -22,7 +22,7 @@ rTime = re.compile(
 
 def fbIsValidInteger(uValue, uMinValueInclusive = None, uMaxValueExclusive = None):
   return (
-    (type(uValue) in [long, int, float])
+    isinstance(uValue, (int, float))
     and (uValue % 1 == 0)
     and (uValue >= uMinValueInclusive if uMinValueInclusive is not None else True)
     and (uValue < uMaxValueExclusive if uMaxValueExclusive is not None else True)
@@ -71,20 +71,20 @@ class cTime(object):
   
   @staticmethod
   def fbIsValidTimeString(sTime):
-    return type(sTime) in [str, unicode] and rTime.match(sTime) is not None;
+    return isinstance(sTime, str) and rTime.match(sTime) is not None;
   @staticmethod
   def fo0FromString(s0Time):
     return None if s0Time is None else cTime.foFromString(s0Time);
   @staticmethod
   def foFromString(sTime):
-    oTimeMatch = rTime.match(sTime) if type(sTime) in [str, unicode] else None;
+    oTimeMatch = rTime.match(sTime) if isinstance(sTime, str) else None;
     if oTimeMatch is None: raise ValueError("Invalid time string " + repr(sTime) + ".");
-    uHour = long(oTimeMatch.group(1) or 0);
+    uHour = int(oTimeMatch.group(1) or 0);
     if (oTimeMatch.group(5) or "").upper() == "PM":
       uHour += 12;
-    uMinute = long(oTimeMatch.group(2) or 0);
-    uSecond = long(oTimeMatch.group(3) or 0);
-    uMicrosecond = long(oTimeMatch.group(4).ljust(6, "0")) if oTimeMatch.group(4) else 0;
+    uMinute = int(oTimeMatch.group(2) or 0);
+    uSecond = int(oTimeMatch.group(3) or 0);
+    uMicrosecond = int(oTimeMatch.group(4).ljust(6, "0")) if oTimeMatch.group(4) else 0;
     return cTime(uHour, uMinute, uSecond, uMicrosecond);
   
   @staticmethod
@@ -240,4 +240,4 @@ class cTime(object):
     if oSelf.uMicrosecond != oSelf.uMicrosecond: return oSelf.uMicrosecond - oOther.uMicrosecond;
     return 0;
 
-from cTimeDuration import cTimeDuration;
+from .cTimeDuration import cTimeDuration;

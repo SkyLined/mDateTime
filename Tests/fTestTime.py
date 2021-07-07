@@ -54,7 +54,7 @@ def fNormalizedDurationMustEqual(sDuration, sNormalizedDuration):
   );
 
 def fTestTime():
-  print "  * Testing cTime/cTimeDuration...";
+  print("  * Testing cTime/cTimeDuration...");
   fTimePlusDurationMustEqual("20:01:01", "+1h",     "1 hour",         "21:01:01");
   fTimePlusDurationMustEqual("20:01:01", "+60m",    "60 minutes",     "21:01:01",         0, "+1h",         "1 hour");
   fTimePlusDurationMustEqual("20:01:01", "+3600s",  "3600 seconds",   "21:01:01",         0, "+1h",         "1 hour");
@@ -76,4 +76,4 @@ def fTestTime():
 
   fNormalizedDurationMustEqual("1h1m1s1u", "+1h+1m+1s+1u");
   fNormalizedDurationMustEqual("+1h+60m+3600s+3600000000u", "+4h");
-  print "    + All tests successful.";
+  print("    + All tests successful.");

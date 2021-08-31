@@ -238,6 +238,11 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
     ] if s]);
   def __str__(oSelf):
     return cDateTimeDuration.fsToString(oSelf);
+  def fasGetDetails(oSelf):
+    return [oSelf.fsToString(), "%snormalized" % ("" if oSelf.fbIsNormalized() else "sign " if oSelf.fbIsSignNormalized() else "not ")];
+  def __repr__(oSelf):
+    sModuleName = ".".join(oSelf.__class__.__module__.split(".")[:-1]);
+    return "<%s.%s#%X|%s>" % (sModuleName, oSelf.__class__.__name__, id(oSelf), "|".join(oSelf.fasGetDetails()));
   
   def __cmp__(oSelf, oOther):
     assert isinstance(oOther, cDateTimeDuration), \

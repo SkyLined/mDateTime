@@ -66,6 +66,14 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
         oTimeDuration.iHours, oTimeDuration.iMinutes, oTimeDuration.iSeconds, oTimeDuration.iMicroseconds
       );
   
+  @staticmethod
+  def foFromSeconds(nSeconds):
+    (iDays, oTimeDuration) = cTimeDuration.ftxFromSeconds(nSeconds);
+    return cDateTimeDuration(
+      0, 0, iDays,
+      oTimeDuration.iHours, oTimeDuration.iMinutes, oTimeDuration.iSeconds, oTimeDuration.iMicroseconds
+    );
+  
   # Constructor
   def __init__(oSelf, iYears, iMonths, iDays, iHours, iMinutes, iSeconds, iMicroseconds):
     cDateDuration.__init__(oSelf, iYears, iMonths, iDays);

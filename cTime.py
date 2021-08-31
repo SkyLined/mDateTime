@@ -206,7 +206,13 @@ class cTime(object):
     return cTime.fbIsAfter(oSelf, cTime.foNow());
   def fbIsInTheFutureUTC(oSelf):
     return cTime.fbIsAfter(oSelf, cTime.foNowUTC());
-
+  
+  def fnToSecondsSinceMidnight(oSelf):
+    return ((oSelf.uHour * 60) + oSelf.uMinute) * 60 + oSelf.uSecond + (oSelf.uMicrosecond / 1000.0 / 1000);
+  
+  def fuToSecondsSinceMidnight(oSelf):
+    return ((oSelf.uHour * 60) + oSelf.uMinute) * 60 + oSelf.uSecond + int(round(oSelf.uMicrosecond / 1000.0 / 1000));
+  
   def fsToHumanReadableString(oSelf):
     # <hour>:<minute>[:<second>[.<microsecond>]]
     sValue = ("%d:%02d:%02d.%06d" % (

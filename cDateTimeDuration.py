@@ -201,8 +201,8 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       oSelf.iSeconds * iSignMultiplier >= 0 and
       oSelf.iMicroseconds * iSignMultiplier >= 0
     );
-  def fbIsNormalized(oSelf, iSignMultiplier = None):
-    iSignMultiplier = oSelf.__fiSignMultiplier() if iSignMultiplier is None else iSignMultiplier;
+  def fbIsNormalized(oSelf, i0SignMultiplier = None):
+    iSignMultiplier = oSelf.__fiSignMultiplier() if i0SignMultiplier is None else i0SignMultiplier;
     return iSignMultiplier == 0 or (
       0 < oSelf.iMonths * iSignMultiplier < 12 and
       0 < oSelf.iDays * iSignMultiplier < 28 and # We can only know for sure if the number of days is small enough

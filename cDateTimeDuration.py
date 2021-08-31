@@ -85,6 +85,10 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       oSelf.iYears, oSelf.iMonths, oSelf.iDays,
       oSelf.iHours, oSelf.iMinutes, oSelf.iSeconds, oSelf.iMicroseconds
     );
+  def foGetDateDuration(oSelf):
+    return cDateDuration.foClone(oSelf);
+  def foGetTimeDuration(oSelf):
+    return cTimeDuration.foClone(oSelf);
   def foGetReversed(oSelf):
     return cDateTimeDuration(
       -oSelf.iYears, -oSelf.iMonths, -oSelf.iDays,

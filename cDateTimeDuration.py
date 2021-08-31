@@ -191,8 +191,8 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
         "This method only works on sign-normalized instances";
     return iSignMultiplier == -1;
   
-  def fbIsSignNormalized(oSelf, iSignMultiplier = None):
-    iSignMultiplier = oSelf.__fiSignMultiplier() if iSignMultiplier is None else iSignMultiplier;
+  def fbIsSignNormalized(oSelf, i0SignMultiplier = None):
+    iSignMultiplier = oSelf.__fiSignMultiplier() if i0SignMultiplier is None else i0SignMultiplier;
     return (
       oSelf.iMonths * iSignMultiplier >= 0 and
       oSelf.iDays * iSignMultiplier >= 0 and

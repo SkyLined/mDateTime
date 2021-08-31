@@ -182,18 +182,22 @@ class cDateDuration(object):
       0 < oSelf.iDays * iSignMultiplier < 28 # We can only know for sure if the number of days is small enough
     );
   
-  def fsToHumanReadableString(oSelf):
-    iSignMultiplier = oSelf.__fiSignMultiplier();
-    if iSignMultiplier == 0: return "0 days";
-    assert cDateDuration.fbIsSignNormalized(oSelf, iSignMultiplier), \
+  def fasToHumanReadableStrings(oSelf):
+    assert cDateDuration.fbIsSignNormalized(oSelf), \
         "Duration must be sign-normalized before converting to human readable string!";
     # Show positive and negative durations the same.
     uYears = abs(oSelf.iYears); uMonths = abs(oSelf.iMonths); uDays = abs(oSelf.iDays);
-    asComponents = [sComponent for sComponent in [
+    return [sComponent for sComponent in [
       ("%d year%s"  % (uYears,  "" if uYears == 1  else "s")) if uYears  else None,
       ("%d month%s" % (uMonths, "" if uMonths == 1 else "s")) if uMonths else None,
       ("%d day%s"   % (uDays,   "" if uDays == 1   else "s")) if uDays   else None,
     ] if sComponent]
+  def fsToHumanReadableString(oSelf, u0MaxNumberOfUnitsInOutput = None):
+    asComponents = oSelf.fasToHumanReadableStrings();
+    if u0MaxNumberOfUnitsInOutput is not None:
+      asComponents = asComponents[:u0MaxNumberOfUnitsInOutput];
+    if len(asComponents) == 0:
+      return "0 days";
     return (
       (", ".join(asComponents[:-1]) + ", and " + asComponents[-1]) if len(asComponents) >= 3 else
       " and ".join(asComponents)

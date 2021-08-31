@@ -194,21 +194,22 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
   def fbIsSignNormalized(oSelf, i0SignMultiplier = None):
     iSignMultiplier = oSelf.__fiSignMultiplier() if i0SignMultiplier is None else i0SignMultiplier;
     return (
-      oSelf.iMonths * iSignMultiplier >= 0 and
-      oSelf.iDays * iSignMultiplier >= 0 and
-      oSelf.iHours * iSignMultiplier >= 0 and
-      oSelf.iMinutes * iSignMultiplier >= 0 and
-      oSelf.iSeconds * iSignMultiplier >= 0 and
-      oSelf.iMicroseconds * iSignMultiplier >= 0
+      0 <= oSelf.iMonths * iSignMultiplier and
+      0 <= oSelf.iDays * iSignMultiplier and
+      0 <= oSelf.iHours * iSignMultiplier and
+      0 <= oSelf.iMinutes * iSignMultiplier and
+      0 <= oSelf.iSeconds * iSignMultiplier and
+      0 <= oSelf.iMicroseconds * iSignMultiplier
     );
   def fbIsNormalized(oSelf, i0SignMultiplier = None):
     iSignMultiplier = oSelf.__fiSignMultiplier() if i0SignMultiplier is None else i0SignMultiplier;
     return iSignMultiplier == 0 or (
-      0 < oSelf.iMonths * iSignMultiplier < 12 and
-      0 < oSelf.iDays * iSignMultiplier < 28 and # We can only know for sure if the number of days is small enough
-      0 < oSelf.iMinutes * iSignMultiplier < 60 and
-      0 < oSelf.iSeconds * iSignMultiplier < 60 and
-      0 < oSelf.iMicroseconds * iSignMultiplier < 1000
+      0 <= oSelf.iYears * iSignMultiplier and
+      0 <= oSelf.iMonths * iSignMultiplier < 12 and
+      0 <= oSelf.iDays * iSignMultiplier and
+      0 <= oSelf.iMinutes * iSignMultiplier < 60 and
+      0 <= oSelf.iSeconds * iSignMultiplier < 60 and
+      0 <= oSelf.iMicroseconds * iSignMultiplier < 1000
     );
   
   def fsToHumanReadableString(oSelf):

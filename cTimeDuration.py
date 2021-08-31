@@ -30,6 +30,42 @@ class cTimeDuration(object):
     return cTimeDuration.foFromString(sMySQL);
   
   @staticmethod
+  def ftxFromSeconds(nSeconds):
+    iSign = -1 if nSeconds < 0 else 1;
+    nTotalSeconds = abs(nSeconds);
+    uTotalSeconds = int(nTotalSeconds);
+    uMicroseconds = int(1000 * 1000 * (nTotalSeconds - uTotalSeconds));
+    # These asserts are here to check the code is doing what it is supposed to do because I ran into an issue
+    # in other code that I think may have been caused by a bug here.
+    assert uMicroseconds >= 0, \
+        "uMicroseconds = %s" % uMicroseconds;
+    uSeconds = uTotalSeconds % 60;
+    assert uSeconds >= 0, \
+        "uSeconds = %s" % uSeconds;
+    
+    uTotalMinutes = (uTotalSeconds - uSeconds) / 60;
+    uMinutes = uTotalMinutes % 60;
+    assert uMinutes >= 0, \
+        "uMinutes = %s" % uMinutes;
+    
+    uTotalHours = (uTotalMinutes - uMinutes) / 60;
+    uHours = uTotalHours % 24;
+    assert uHours >= 0, \
+        "uHours = %s" % uHours;
+    
+    uDays = (uTotalHours - uHours) / 24;
+    assert uDays >= 0, \
+        "uDays = %s" % uDays;
+    
+    oTimeDuration = cTimeDuration(
+      iSign * uHours,
+      iSign * uMinutes,
+      iSign * uSeconds,
+      iSign * uMicroseconds,
+    );
+    return (iSign * uDays, oTimeDuration);
+  
+  @staticmethod
   def fbIsValidDurationString(sDuration):
     oDurationMatch = rTimeDuration.match(sDuration) if isinstance(sDuration, str) else None;
     return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);

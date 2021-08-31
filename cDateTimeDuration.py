@@ -212,27 +212,14 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       0 <= oSelf.iMicroseconds * iSignMultiplier < 1000
     );
   
-  def fsToHumanReadableString(oSelf):
-    iSignMultiplier = oSelf.__fiSignMultiplier();
-    if iSignMultiplier == 0: return "0 seconds";
-    assert cDateTimeDuration.fbIsSignNormalized(oSelf, iSignMultiplier), \
+  def fsToHumanReadableString(oSelf, u0MaxNumberOfUnitsInOutput = None):
+    assert cDateTimeDuration.fbIsSignNormalized(oSelf), \
         "Duration must be sign-normalized before converting to human readable string!";
-    # Show positive and negative durations the same.
-    uYears = abs(oSelf.iYears); uMonths = abs(oSelf.iMonths); uDays = abs(oSelf.iDays);
-    uHours = abs(oSelf.iHours); uMinutes = abs(oSelf.iMinutes); uSeconds = abs(oSelf.iSeconds);
-    uMilliAndMicroseconds = abs(oSelf.iMicroseconds);
-    uMicroseconds = uMilliAndMicroseconds % 1000;
-    uMilliseconds = (uMilliAndMicroseconds - uMicroseconds) / 1000;
-    asComponents = [sComponent for sComponent in [
-      ("%d year%s"        % (uYears,        "" if uYears == 1        else "s")) if uYears        else None,
-      ("%d month%s"       % (uMonths,       "" if uMonths == 1       else "s")) if uMonths       else None,
-      ("%d day%s"         % (uDays,         "" if uDays == 1         else "s")) if uDays         else None,
-      ("%d hour%s"        % (uHours,        "" if uHours == 1        else "s")) if uHours        else None,
-      ("%d minute%s"      % (uMinutes,      "" if uMinutes == 1      else "s")) if uMinutes      else None,
-      ("%d second%s"      % (uSeconds,      "" if uSeconds == 1      else "s")) if uSeconds      else None,
-      ("%d millisecond%s" % (uMilliseconds, "" if uMilliseconds == 1 else "s")) if uMilliseconds else None,
-      ("%d microsecond%s" % (uMicroseconds, "" if uMicroseconds == 1 else "s")) if uMicroseconds else None,
-    ] if sComponent]
+    asComponents = cDateDuration.fasToHumanReadableStrings(oSelf) + cTimeDuration.fasToHumanReadableStrings(oSelf);
+    if u0MaxNumberOfUnitsInOutput is not None:
+      asComponents = asComponents[:u0MaxNumberOfUnitsInOutput];
+    if len(asComponents) == 0:
+      return "0 seconds";
     return (
       (", ".join(asComponents[:-1]) + ", and " + asComponents[-1]) if len(asComponents) >= 3 else
       " and ".join(asComponents)

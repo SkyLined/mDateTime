@@ -139,7 +139,7 @@ class cTime(object):
     if uSecond is not None: oSelf.uSecond = uSecond;
     if uMicrosecond is not None: oSelf.uMicrosecond = uMicrosecond;
   
-  def ftoGetEndTimeAndOverflowedDaysForDuration(oSelf, oDuration):
+  def ftxGetEndTimeAndOverflowedDaysForDuration(oSelf, oDuration):
     # Note that this code ignores the time (if any) in oDuration
     # Add the year and month:
     iTotalMicroseconds = oSelf.uMicrosecond + oDuration.iMicroseconds;

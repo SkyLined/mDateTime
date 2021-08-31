@@ -25,7 +25,7 @@ def fTimePlusDurationMustEqual(sStartTime, sDuration, sExpectedHumanReadableDura
   assert sHumanReadableDuration == sExpectedHumanReadableDuration, \
       "cTimeDuration(%s).fsToHumanReadableString() == %s (NOT %s)" % (sDuration, sHumanReadableDuration, sExpectedHumanReadableDuration)
 
-  oEndTime, iOverflowedDays = oStartTime.ftoGetEndTimeAndOverflowedDaysForDuration(oDuration);
+  oEndTime, iOverflowedDays = oStartTime.ftxGetEndTimeAndOverflowedDaysForDuration(oDuration);
   assert iOverflowedDays == iExpectedOverflowedDays, \
       "iOverflowedDays == %d (NOT %d)" % (iOverflowedDays, iExpectedOverflowedDays);
   sEndTime = str(oEndTime);

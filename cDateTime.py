@@ -125,7 +125,7 @@ class cDateTime(cTime, cDate):
     # is done on a copy so as not to modify the argument passed to this function.
     if oTimeDuration:
       # Found out how many days we will go forward/backwards base on time duration:
-      oEndTime, iOverflowedDays = cTime.ftoGetEndTimeAndOverflowedDaysForDuration(oSelf, oTimeDuration);
+      oEndTime, iOverflowedDays = cTime.ftxGetEndTimeAndOverflowedDaysForDuration(oSelf, oTimeDuration);
       if iOverflowedDays:
         if oDateDuration:
           oDateDuration = oDateDuration.foClone();

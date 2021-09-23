@@ -148,6 +148,10 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
 #    print("d: %s" % str(oSelf));
     # Normalize sign for time if different from date.
     iDateSignMultiplier = oSelf.__fiDateSignMultiplier();
+    if iOverflowedDays * iDateSignMultiplier < 0: # Neither is 0 and only 1 is < 0
+      # Re-normalize time duration.
+      cTimeDuration.fNormalize(oSelf);
+#      print("t: %s" % str(oSelf));
     iTimeSignMultiplier = oSelf.__fiTimeSignMultiplier();
     if iDateSignMultiplier * iTimeSignMultiplier < 0: # Neither is 0 and only 1 is < 0
       # Flow back from days into hours.

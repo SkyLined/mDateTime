@@ -218,7 +218,7 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
   
   def fsToHumanReadableString(oSelf, u0MaxNumberOfUnitsInOutput = None):
     assert cDateTimeDuration.fbIsSignNormalized(oSelf), \
-        "Duration must be sign-normalized before converting to human readable string!";
+        "Duration (%s) must be sign-normalized before converting to human readable string!" % oSelf;
     asComponents = cDateDuration.fasToHumanReadableStrings(oSelf) + cTimeDuration.fasToHumanReadableStrings(oSelf);
     if u0MaxNumberOfUnitsInOutput is not None:
       asComponents = asComponents[:u0MaxNumberOfUnitsInOutput];

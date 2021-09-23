@@ -151,12 +151,12 @@ class cDateTime(cTime, cDate):
         cTime.fbIsBefore(oSelf, oDateTime)
       )
     );
-  def fbIsEqualTo(oSelf, oDate):
+  def fbIsEqualTo(oSelf, oDateTime):
     return (
       cDate.fbIsEqualTo(oSelf, oDateTime) and
       cTime.fbIsEqualTo(oSelf, oDateTime)
     );
-  def fbIsAfter(oSelf, oDate):
+  def fbIsAfter(oSelf, oDateTime):
     return (
       cDate.fbIsAfter(oSelf, oDateTime)
       or (

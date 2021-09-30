@@ -30,4 +30,3 @@ traceback
 typing
 warnings
 zipfile
-zlib

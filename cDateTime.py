@@ -1,5 +1,7 @@
 import calendar, datetime, re, time;
 
+gbDebugOutput = False;
+
 from .cDate import cDate;
 from .cTime import cTime;
 
@@ -139,8 +141,28 @@ class cDateTime(cTime, cDate):
     return cDateTime.foFromDateAndTime(oEndDate, oEndTime);
   
   def foGetDurationForEndDateTime(oSelf, oEndDateTime):
-    oDateDuration = cDate.foGetDurationForEndDate(oSelf, oEndDateTime);
+    # If the end date is before the start date, reverse them, get the duration,
+    # make it negative and return that. This allows us to assume oSelf >= oEndDateTime.
+    if oEndDateTime.fbIsBefore(oSelf):
+      oDuration = oEndDateTime.foGetDurationForEndDateTime(oSelf);
+      oDuration.fNegative();
+      if gbDebugOutput: print("=> return: %s" % oDuration);
+      return oDuration;
+    if gbDebugOutput: print("=== cDateTime.foGetDurationForEndDateTime(%s, %s) ===" % (str(oSelf), str(oEndDateTime)));
     oTimeDuration = cTime.foGetDurationForEndTime(oSelf, oEndDateTime);
+    if gbDebugOutput: print("  1: time duration %s" % oTimeDuration);
+    if cTime.fbIsAfter(oSelf, oEndDateTime):
+      # The end date-time is at an earlier time in the day than the start.
+      # Let's add 24 hours to the time duration and move the date a day forward:
+      oTimeDuration.iHours += 24;
+      oTimeDuration.fNormalize(); # This should now be positive.
+      if gbDebugOutput: print("  2: time duration %s" % oTimeDuration);
+      oEndDate = cDate.foGetEndDateForDuration(oEndDateTime, cDateDuration(iDays = -1));
+    else:
+      oEndDate = oEndDateTime.foGetDate();
+    if gbDebugOutput: print("  3: end date %s" % oEndDate);
+    oDateDuration = cDate.foGetDurationForEndDate(oSelf, oEndDate);
+    if gbDebugOutput: print("  4: date duration %s" % oDateDuration);
     return cDateTimeDuration.foFromDateAndTimeDuration(oDateDuration, oTimeDuration);
   
   def fbIsBefore(oSelf, oDateTime):

@@ -51,7 +51,7 @@ class cDateDuration(object):
     iDays = int(sDays) if sDays else 0;
     return cDateDuration(iYears, iMonths, iDays);
   # Constructor
-  def __init__(oSelf, iYears, iMonths, iDays):
+  def __init__(oSelf, iYears = 0, iMonths = 0, iDays = 0):
     if not fbIsValidInteger(iYears): raise ValueError("Invalid number of years " + repr(iYears) + ".");
     if not fbIsValidInteger(iMonths): raise ValueError("Invalid number of months " + repr(iMonths) + ".");
     if not fbIsValidInteger(iDays): raise ValueError("Invalid number of days " + repr(iDays) + ".");
@@ -115,7 +115,6 @@ class cDateDuration(object):
     iSignNumber = oSelf.iYears or oSelf.iMonths or oSelf.iDays;
     return -1 if iSignNumber < 0 else 0 if iSignNumber == 0 else 1;
   def fNormalize(oSelf):
-    # Normalize ranges ("13m" -> "1y,1m")
     # We cannot do this for days, as the number of days in a month varies by month.
     def ftxGetValueInRangeAndOverflow(iValue, uMaxValue):
       iValueInRange = iValue % uMaxValue;

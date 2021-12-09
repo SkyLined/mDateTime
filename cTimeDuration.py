@@ -84,7 +84,7 @@ class cTimeDuration(object):
     iMicroseconds = int(sMicroseconds) if sMicroseconds else 0;
     return cTimeDuration(iHours, iMinutes, iSeconds, iMicroseconds);
   # Constructor
-  def __init__(oSelf, iHours, iMinutes, iSeconds, iMicroseconds):
+  def __init__(oSelf, iHours = 0, iMinutes = 0, iSeconds = 0, iMicroseconds = 0):
     if not fbIsValidInteger(iHours): raise ValueError("Invalid number of hours " + repr(iHours) + ".");
     if not fbIsValidInteger(iMinutes): raise ValueError("Invalid number of minutes " + repr(iMinutes) + ".");
     if not fbIsValidInteger(iSeconds): raise ValueError("Invalid number of seconds " + repr(iSeconds) + ".");

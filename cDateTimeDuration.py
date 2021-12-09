@@ -75,7 +75,7 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
     );
   
   # Constructor
-  def __init__(oSelf, iYears, iMonths, iDays, iHours, iMinutes, iSeconds, iMicroseconds):
+  def __init__(oSelf, iYears = 0, iMonths = 0, iDays = 0, iHours = 0, iMinutes = 0, iSeconds = 0, iMicroseconds = 0):
     cDateDuration.__init__(oSelf, iYears, iMonths, iDays);
     cTimeDuration.__init__(oSelf, iHours, iMinutes, iSeconds, iMicroseconds);
   

@@ -181,6 +181,7 @@ class cDate(object):
     return oEndDate;
   
   def foGetDurationForEndDate(oSelf, oEndDate):
+    if gbDebugOutput: print("=== cDate.foGetDurationForEndDate(%s, %s) ===" % (str(oSelf), str(oEndDate)));
     # If the end date is before this date, the duration is going to be negative.
     # To keep this code simple to review, we always calculate the positive duration between the two dates
     # and later invert it should the real result be a negative duration.
@@ -191,6 +192,7 @@ class cDate(object):
     uDurationYears = oLastDate.uYear - oFirstDate.uYear;
     uDurationMonths = oLastDate.uMonth - oFirstDate.uMonth;
     uDurationDays = oLastDate.uDay - oFirstDate.uDay;
+    if gbDebugOutput: print("  1: %+dy%+dm%+dd*%+d" % (uDurationYears, uDurationMonths, uDurationDays, uDurationMultiplier));
     # The number of days in the last month various
     uDaysInLastDatesPreviousMonth = cDate.fuGetLastDayInMonth(oLastDate.uYear - (1 if oLastDate.uMonth == 1 else 0), ((oLastDate.uMonth + 10) % 12) + 1);
     if uDurationDays >= oLastDate.uDay:
@@ -198,21 +200,25 @@ class cDate(object):
       # e.g. 2000-1-31 -> 2000-2-2 => -1m+29d (at this point) => +2d (after this adjustment)
       uDurationMonths += 1;
       uDurationDays = uDaysInLastDatesPreviousMonth - uDurationDays;
+      if gbDebugOutput: print("  2: d->m: %+dy%+dm%+dd*%+d" % (uDurationYears, uDurationMonths, uDurationDays, uDurationMultiplier));
     elif uDurationDays < 0:
       # If uDurationDays < 0, the day is before adding the days moved it into a new month; convert this into a month and adjust the days.
       # e.g. 2000-1-2 -> 2000-2-1 => +1m-1d (at this point) => +30d (after this adjustment)
       uDurationMonths -= 1;
       uDurationDays += uDaysInLastDatesPreviousMonth;
+      if gbDebugOutput: print("  2: d->m: %+dy%+dm%+dd*%+d" % (uDurationYears, uDurationMonths, uDurationDays, uDurationMultiplier));
     # If uDurationMonths < 0 or >= 12, convert the excess to years and add them.
     if uDurationMonths < 0 or uDurationMonths >= 12:
-      uDurationYears += int(uDurationMonths / 12) + (-1 if uDurationMonths < 0 else 0);
-      uDurationMonths = (uDurationMonths % 12) + (12 if uDurationMonths < 0 else 0);
+      uDurationYears += math.floor(uDurationMonths / 12);
+      uDurationMonths = uDurationMonths % 12;
+      if gbDebugOutput: print("  3: m->y: %+dy%+dm%+dd*%+d" % (uDurationYears, uDurationMonths, uDurationDays, uDurationMultiplier));
     from .cDateDuration import cDateDuration;
     oDuration = cDateDuration(
       uDurationYears * uDurationMultiplier,
       uDurationMonths * uDurationMultiplier,
       uDurationDays * uDurationMultiplier,
     );
+    if gbDebugOutput: print("=> return %s" % oDuration);
     return oDuration;
   
   def fbIsBefore(oSelf, oDate):
@@ -246,7 +252,7 @@ class cDate(object):
     return cDate.fbIsAfter(oSelf, cDate.foNow());
   def fbIsInTheFutureUTC(oSelf):
     return cDate.fbIsAfter(oSelf, cDate.foNowUTC());
-
+  
   def fsToHumanReadableString(oSelf):
     # Month <day>th, <year>
     return "%s %d%s, %d" % (

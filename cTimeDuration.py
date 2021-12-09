@@ -1,4 +1,6 @@
-import re;
+import math, re;
+
+gbDebugOutput = False;
 
 rTimeDuration = re.compile(
   r"^\s*" +
@@ -157,28 +159,34 @@ class cTimeDuration(object):
     iSignNumber = oSelf.iHours or oSelf.iMinutes or oSelf.iSeconds or oSelf.iMicroseconds;
     return -1 if iSignNumber < 0 else 0 if iSignNumber == 0 else 1;
   def fNormalize(oSelf):
-    # Normalize ranges ("61s" -> "1m,1s")
-    def ftxGetValueInRangeAndOverflow(iValue, uMaxValue):
-      iValueInRange = iValue % uMaxValue;
-      iOverflow = (iValue - iValueInRange) / uMaxValue;
-      return (iValueInRange, iOverflow);
-    iMicroseconds, iOverflowedSeconds = ftxGetValueInRangeAndOverflow(oSelf.iMicroseconds, 1000 * 1000);
-    iSeconds, iOverflowedMinutes = ftxGetValueInRangeAndOverflow(oSelf.iSeconds + iOverflowedSeconds, 60);
-    iMinutes, iOverflowedHours = ftxGetValueInRangeAndOverflow(oSelf.iMinutes + iOverflowedMinutes, 60);
-    iHours = oSelf.iHours + iOverflowedHours;
-    # Normalize signs ("1m,-1s" -> "59s")
-    iSignMultiplier = oSelf.__fiSignMultiplier();
-    def ftxGetCorrectlySignedValueInRangeAndOverflow(iValue, uMaxValue):
-      if iValue * iSignMultiplier >= 0:
-        return (iValue, 0); # Already correctly signed, no overflow
-      return (
-        iValue + uMaxValue * iSignMultiplier, # Fix sign
-        iSignMultiplier # overflow
-      );
-    (oSelf.iMicroseconds, iOverflowedSeconds) = ftxGetCorrectlySignedValueInRangeAndOverflow(iMicroseconds, 1000 * 1000);
-    (oSelf.iSeconds, iOverflowedMinutes) = ftxGetCorrectlySignedValueInRangeAndOverflow(iSeconds + iOverflowedSeconds, 60);
-    (oSelf.iMinutes, iOverflowedHours) = ftxGetCorrectlySignedValueInRangeAndOverflow(iMinutes + iOverflowedMinutes, 60);
-    oSelf.iHours = iHours + iOverflowedHours;
+    if gbDebugOutput: print("=== cTimeDuration.fNormalize(%s) ===" % str(oSelf));
+    # Normalize ranges and make everything except hours positive ("-61s" -> "-1h+58m+59s")
+    def ftiGetPositiveValueInRangeAndOverflow(iValue, uMaxValue, iOverflowBaseValue):
+      iOverflow = math.floor(iValue / uMaxValue);
+      uValueInRange = iValue % uMaxValue;
+      return (uValueInRange, iOverflow + iOverflowBaseValue);
+    oSelf.iMicroseconds, oSelf.iSeconds = ftiGetPositiveValueInRangeAndOverflow(oSelf.iMicroseconds, 1000 * 1000, oSelf.iSeconds);
+    if gbDebugOutput: print("  1: s<-u %s" % oSelf);
+    oSelf.iSeconds, oSelf.iMinutes = ftiGetPositiveValueInRangeAndOverflow(oSelf.iSeconds, 60, oSelf.iMinutes);
+    if gbDebugOutput: print("  2: m<-s %s" % oSelf);
+    oSelf.iMinutes, oSelf.iHours = ftiGetPositiveValueInRangeAndOverflow(oSelf.iMinutes, 60, oSelf.iHours);
+    if gbDebugOutput: print("  3: h<-m %s" % oSelf);
+    if oSelf.iHours < 0:
+      # negative hours: make everything negative or zero.
+      if oSelf.iMinutes or oSelf.iSeconds or oSelf.iMicroseconds:
+        # borrow an hour to make the rest negative.
+        oSelf.iHours +=1; # will remain negative or become zero
+        oSelf.iMinutes -= 60; # will become negative
+        if gbDebugOutput: print("  4: h->m %s" % oSelf);
+      if oSelf.iSeconds or oSelf.iMicroseconds:
+        oSelf.iMinutes +=1; # will remain negative or become zero
+        oSelf.iSeconds -= 60; # will become negative
+        if gbDebugOutput: print("  5: m->s %s" % oSelf);
+      if oSelf.iMicroseconds:
+        oSelf.iSeconds +=1; # will remain negative or become zero
+        oSelf.iMicroseconds -= 1000 * 1000; # will become negative
+        if gbDebugOutput: print("  6: s->u %s" % oSelf);
+    if gbDebugOutput: print("=> result: %s" % str(oSelf));
   def foNormalized(oSelf):
     oNormalized = cTimeDuration.foClone(oSelf);
     cTimeDuration.fNormalize(oNormalized);

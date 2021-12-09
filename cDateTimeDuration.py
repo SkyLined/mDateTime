@@ -216,6 +216,14 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       0 <= oSelf.iMicroseconds * iSignMultiplier < 1000
     );
   
+  def fNegative(oSelf):
+    oSelf.iYears *= -1;
+    oSelf.iMonths *= -1;
+    oSelf.iDays *= -1;
+    oSelf.iMinutes *= -1;
+    oSelf.iSeconds *= -1;
+    oSelf.iMicroseconds *= -1;
+  
   def fsToHumanReadableString(oSelf, u0MaxNumberOfUnitsInOutput = None):
     assert cDateTimeDuration.fbIsSignNormalized(oSelf), \
         "Duration (%s) must be sign-normalized before converting to human readable string!" % oSelf;

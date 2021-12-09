@@ -1,5 +1,7 @@
 import datetime, re;
 
+gbDebugOutput = False;
+
 rTime = re.compile(
   r"^\s*" +
   r"(\d{1,2})" +
@@ -158,13 +160,17 @@ class cTime(object):
     return (oEndTime, iOverflowedDays);
   
   def foGetDurationForEndTime(oSelf, oEndTime):
-    iMicroseconds = oEndTime.uMicrosecond - oSelf.uMicrosecond;
-    iSeconds = oEndTime.uSecond - oSelf.uSecond;
-    iMinutes = oEndTime.uMinute - oSelf.uMinute;
-    iHours = oEndTime.uHour - oSelf.uHour;
-    oDuration = cTimeDuration(iHours, iMinutes, iSeconds, iMicroseconds);
-    oDuration.fNormalize();
-    return oDuration;
+    if gbDebugOutput: print("=== cTime.foGetDurationForEndTime(%s, %s) ===" % (str(oSelf), str(oEndTime)));
+    iDurationMicroseconds = oEndTime.uMicrosecond - oSelf.uMicrosecond;
+    iDurationSeconds = oEndTime.uSecond - oSelf.uSecond;
+    iDurationMinutes = oEndTime.uMinute - oSelf.uMinute;
+    iDurationHours = oEndTime.uHour - oSelf.uHour;
+    if gbDebugOutput: print("  1: %+dh%+dm%+ds%+du" % (iDurationHours, iDurationMinutes, iDurationSeconds, iDurationMicroseconds));
+    oTimeDuration = cTimeDuration(iDurationHours, iDurationMinutes, iDurationSeconds, iDurationMicroseconds);
+    if gbDebugOutput: print("  2: %s" % (oTimeDuration,));
+    oTimeDuration.fNormalize();
+    if gbDebugOutput: print("=> return: %s" % (oTimeDuration,));
+    return oTimeDuration;
   
   def fbIsBefore(oSelf, oTime):
     if oSelf.uHour < oTime.uHour: return True;

@@ -213,11 +213,37 @@ class cDateTime(cTime, cDate):
   
   def __str__(oSelf):
     return cDateTime.fsToString(oSelf);
+  def fasGetDetails(oSelf):
+    return [oSelf.fsToString()];
+  def __repr__(oSelf):
+    sModuleName = ".".join(oSelf.__class__.__module__.split(".")[:-1]);
+    return "<%s.%s#%X|%s>" % (sModuleName, oSelf.__class__.__name__, id(oSelf), "|".join(oSelf.fasGetDetails()));
   
-  def __cmp__(oSelf, oOther):
-    assert isinstance(oOther, cDateTime), \
+  def __lt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
         "Cannot compare %s to %s" % (oSelf, oOther);
-    return cDate.__cmp__(oSelf, oOther) or cTime.__cmp__(oSelf, oOther);
+    return (
+      cDate.__lt__(oSelf, oOther)
+      or cTime.__lt__(oSelf, oOther)
+    );
+  def __le__(oSelf, oOther):
+    return oSelf < oOther or oSelf == oOther;
+  def __eq__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      cDate.__eq__(oSelf, oOther)
+      or cTime.__eq__(oSelf, oOther)
+    );
+  def __gt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      cDate.__gt__(oSelf, oOther)
+      or cTime.__gt__(oSelf, oOther)
+    );
+  def __ge__(oSelf, oOther):
+    return oSelf > oOther or oSelf == oOther;
 
 from .cDateTimeDuration import cDateTimeDuration;
 from .cDateDuration import cDateDuration;

@@ -271,11 +271,19 @@ class cTimeDuration(object):
   def __str__(oSelf):
     return cTimeDuration.fsToString(oSelf);
   
-  def __cmp__(oSelf, oOther):
-    assert isinstance(oOther, cTimeDuration), \
+  def __lt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
         "Cannot compare %s to %s" % (oSelf, oOther);
-    if oSelf.iHours != oSelf.iHours: return oSelf.iHours - oOther.iHours;
-    if oSelf.iMinutes != oSelf.iMinutes: return oSelf.iMinutes - oOther.iMinutes;
-    if oSelf.iSeconds != oSelf.iSeconds: return oSelf.iSeconds - oOther.iSeconds;
-    if oSelf.iMicroseconds != oSelf.iMicroseconds: return oSelf.iMicroseconds - oOther.iMicroseconds;
-    return 0;
+    return oSelf.fnGetTotalSeconds() < oOther.fnGetTotalSeconds();
+  def __le__(oSelf, oOther):
+    return oSelf < oOther or oSelf == oOther;
+  def __eq__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return oSelf.fnGetTotalSeconds() == oOther.fnGetTotalSeconds();
+  def __gt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return oSelf.fnGetTotalSeconds() > oOther.fnGetTotalSeconds();
+  def __ge__(oSelf, oOther):
+    return oSelf > oOther or oSelf == oOther;

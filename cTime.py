@@ -243,13 +243,37 @@ class cTime(object):
   def __str__(oSelf):
     return cTime.fsToString(oSelf);
   
-  def __cmp__(oSelf, oOther):
-    assert isinstance(oOther, cTime), \
+  def __lt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
         "Cannot compare %s to %s" % (oSelf, oOther);
-    if oSelf.uHour != oSelf.uHour: return oSelf.uHour - oOther.uHour;
-    if oSelf.uMinute != oSelf.uMinute: return oSelf.uMinute - oOther.uMinute;
-    if oSelf.uSecond != oSelf.uSecond: return oSelf.uSecond - oOther.uSecond;
-    if oSelf.uMicrosecond != oSelf.uMicrosecond: return oSelf.uMicrosecond - oOther.uMicrosecond;
-    return 0;
+    return (
+      oSelf.uHour < oOther.uHour
+      or oSelf.uMinute < oOther.uMinute
+      or oSelf.uSecond < oOther.uSecond
+      or oSelf.uMicrosecond < oOther.uMicrosecond
+    );
+  def __le__(oSelf, oOther):
+    return oSelf < oOther or oSelf == oOther;
+  def __eq__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      oSelf.uHour == oOther.uHour
+      or oSelf.uMinute == oOther.uMinute
+      or oSelf.uSecond == oOther.uSecond
+      or oSelf.uMicrosecond == oOther.uMicrosecond
+    );
+  def __gt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      oSelf.uHour > oOther.uHour
+      or oSelf.uMinute > oOther.uMinute
+      or oSelf.uSecond > oOther.uSecond
+      or oSelf.uMicrosecond > oOther.uMicrosecond
+    );
+  def __ge__(oSelf, oOther):
+    return oSelf > oOther or oSelf == oOther;
+
 
 from .cTimeDuration import cTimeDuration;

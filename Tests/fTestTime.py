@@ -6,6 +6,7 @@ def fMustBeEqual(xValue1, xValue2, sErrorMessage):
     (isinstance(xValue1, mDateTime.cTime) or isinstance(xValue1, mDateTime.cTimeDuration))
     and (isinstance(xValue2, mDateTime.cTime) or isinstance(xValue2, mDateTime.cTimeDuration))
     and str(xValue1) == str(xValue2)
+    and xValue1 == xValue2
   ):
     raise AssertionError(sErrorMessage);
 
@@ -73,7 +74,7 @@ def fTestTime():
                                                                       "20:01:02");
   fTimePlusDurationMustEqual("20:01:01.000001", "+24h+60m+60s+1000000u", "24 hours, 60 minutes, 60 seconds, and 1000 milliseconds", \
                                                                       "21:02:02.000001",  1, "+25h+1m+1s",  "25 hours, 1 minute, and 1 second", "+1h+1m+1s");
-
   fNormalizedDurationMustEqual("1h1m1s1u", "+1h+1m+1s+1u");
   fNormalizedDurationMustEqual("+1h+60m+3600s+3600000000u", "+4h");
+  
   print("    + All tests successful.");

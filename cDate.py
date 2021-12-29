@@ -275,10 +275,31 @@ class cDate(object):
   def __str__(oSelf):
     return cDate.fsToString(oSelf);
   
-  def __cmp__(oSelf, oOther):
-    assert isinstance(oOther, cDate), \
+  def __lt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
         "Cannot compare %s to %s" % (oSelf, oOther);
-    if oSelf.uYear != oSelf.uYear: return oSelf.uYear - oOther.uYear;
-    if oSelf.uMonth != oSelf.uMonth: return oSelf.uMonth - oOther.uMonth;
-    if oSelf.uDay != oSelf.uDay: return oSelf.uDay - oOther.uDay;
-    return 0;
+    return (
+      oSelf.uYear < oOther.uYear
+      or oSelf.uMonth < oOther.uMonth
+      or oSelf.uDay < oOther.uDay
+    );
+  def __le__(oSelf, oOther):
+    return oSelf < oOther or oSelf == oOther;
+  def __eq__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      oSelf.uYear == oOther.uYear
+      and oSelf.uMonth == oOther.uMonth
+      and oSelf.uDay == oOther.uDay
+    );
+  def __gt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    return (
+      oSelf.uYear > oOther.uYear
+      or oSelf.uMonth > oOther.uMonth
+      or oSelf.uDay > oOther.uDay
+    );
+  def __ge__(oSelf, oOther):
+    return oSelf > oOther or oSelf == oOther;

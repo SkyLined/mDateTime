@@ -221,12 +221,42 @@ class cDateDuration(object):
   def __str__(oSelf):
     return cDateDuration.fsToString(oSelf);
   
-  def __cmp__(oSelf, oOther):
-    assert isinstance(oOther, cDateDuration), \
+  def __lt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
         "Cannot compare %s to %s" % (oSelf, oOther);
-    if oSelf.iYears != oSelf.iYears: return oSelf.iYears - oOther.iYears;
-    if oSelf.iMonths != oSelf.iMonths: return oSelf.iMonths - oOther.iMonths;
-    if oSelf.iDays != oSelf.iDays: return oSelf.iDays - oOther.iDays;
-    return 0;
+    if oSelf.iDays < 28 and oOther.iDays < 28:
+      return oSelf.iYears * 12 + oSelf.iMonths < oOther.iYears * 12 + oOther.iMonths;
+    else:
+      assert oSelf.iYears * 12 + oSelf.iMonths == oOther.iYears * 12 + oOther.iMonths, \
+          "Cannot compare %s to %s because the number of years/months are different and the number of days > 28" % (
+            oSelf, oOther
+          );
+      return oSelf.iDays < oOther.iDays
+  def __le__(oSelf, oOther):
+    return oSelf < oOther or oSelf == oOther;
+  def __eq__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    if oSelf.iDays < 28 and oOther.iDays < 28:
+      return oSelf.iYears * 12 + oSelf.iMonths == oOther.iYears * 12 + oOther.iMonths;
+    else:
+      assert oSelf.iYears * 12 + oSelf.iMonths == oOther.iYears * 12 + oOther.iMonths, \
+          "Cannot compare %s to %s because the number of years/months are different and the number of days > 28" % (
+            oSelf, oOther
+          );
+      return oSelf.iDays == oOther.iDays
+  def __gt__(oSelf, oOther):
+    assert isinstance(oOther, oSelf.__class__), \
+        "Cannot compare %s to %s" % (oSelf, oOther);
+    if oSelf.iDays < 28 and oOther.iDays < 28:
+      return oSelf.iYears * 12 + oSelf.iMonths > oOther.iYears * 12 + oOther.iMonths;
+    else:
+      assert oSelf.iYears * 12 + oSelf.iMonths == oOther.iYears * 12 + oOther.iMonths, \
+          "Cannot compare %s to %s because the number of years/months are different and the number of days > 28" % (
+            oSelf, oOther
+          );
+      return oSelf.iDays > oOther.iDays
+  def __ge__(oSelf, oOther):
+    return oSelf > oOther or oSelf == oOther;
 
 from .cDate import cDate;

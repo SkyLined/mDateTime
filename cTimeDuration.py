@@ -251,6 +251,18 @@ class cTimeDuration(object):
       " and ".join(asComponents)
     );
   
+  def fsToDigitsString(oSelf, bIncludeFractionalSeconds = True):
+    assert cTimeDuration.fbIsSignNormalized(oSelf), \
+        "Duration must be sign-normalized before converting to human readable string!";
+    uHours = abs(oSelf.iHours); uMinutes = abs(oSelf.iMinutes); uSeconds = abs(oSelf.iSeconds);
+    uMicroseconds = abs(oSelf.iMicroseconds);
+    return "%s%02d:%02d%s" % (
+      "" if uHours == 0 else "%d:" % uHours,
+      uMinutes,
+      uSeconds,
+      (".%06d" % uMicroseconds).rstrip("0") if bIncludeFractionalSeconds and uMicroseconds else ""
+    );
+  
   def fxToJSON(oSelf):
     # JSON encoding uses the "string value" of cTimeDuration.
     return cTimeDuration.fsToString(oSelf);

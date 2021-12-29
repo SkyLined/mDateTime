@@ -236,6 +236,16 @@ class cDateTimeDuration(cDateDuration, cTimeDuration):
       (", ".join(asComponents[:-1]) + ", and " + asComponents[-1]) if len(asComponents) >= 3 else
       " and ".join(asComponents)
     );
+  def fsToDigitsString(oSelf, u0MaxNumberOfUnitsInOutput = None):
+    asComponents = cDateDuration.fasToHumanReadableStrings(oSelf);
+    # Only add fractional seconds if there are no more days.
+    asComponents.append(cTimeDuration.fsToDigitsString(oSelf, bIncludeFractionalSeconds = len(asComponents) == 0));
+    if u0MaxNumberOfUnitsInOutput is not None:
+      asComponents = asComponents[:u0MaxNumberOfUnitsInOutput];
+    return (
+      (", ".join(asComponents[:-1]) + ", and " + asComponents[-1]) if len(asComponents) >= 3 else
+      " and ".join(asComponents)
+    );
   
   def fxToJSON(oSelf):
     # JSON encoding uses the "string value" of cDateDuration.

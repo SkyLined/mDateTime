@@ -225,6 +225,9 @@ class cTimeDuration(object):
       0 < oSelf.iMicroseconds * iSignMultiplier < 1000 * 1000
     );
   
+  def fnGetTotalSeconds(oSelf):
+    return ((oSelf.iHours * 60) + oSelf.iMinutes * 60) + oSelf.iSeconds + (oSelf.iMicroseconds / 1000000.0);
+  
   def fasToHumanReadableStrings(oSelf):
     assert cTimeDuration.fbIsSignNormalized(oSelf), \
         "Duration must be sign-normalized before converting to human readable string!";

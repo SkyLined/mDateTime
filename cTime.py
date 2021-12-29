@@ -47,7 +47,7 @@ class cTime(object):
   @staticmethod
   def fsGetTimeString(uHour, uMinute, uSecond, uMicrosecond):
     return ("%02d:%02d:%02d.%06d" % (uHour, uMinute, uSecond, uMicrosecond)).rstrip("0").rstrip(".");
-
+  
   @staticmethod
   def fo0FromPyTime(oTime):
     return None if oTime is None else cTime.foFromPyTime(oTime);
@@ -242,6 +242,11 @@ class cTime(object):
     return cTime.fsGetTimeString(oSelf.uHour, oSelf.uMinute, oSelf.uSecond, oSelf.uMicrosecond);
   def __str__(oSelf):
     return cTime.fsToString(oSelf);
+  def fasGetDetails(oSelf):
+    return [oSelf.fsToString()];
+  def __repr__(oSelf):
+    sModuleName = ".".join(oSelf.__class__.__module__.split(".")[:-1]);
+    return "<%s.%s#%X|%s>" % (sModuleName, oSelf.__class__.__name__, id(oSelf), "|".join(oSelf.fasGetDetails()));
   
   def __lt__(oSelf, oOther):
     assert isinstance(oOther, oSelf.__class__), \

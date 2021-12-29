@@ -270,6 +270,11 @@ class cTimeDuration(object):
     ]) or "0s";
   def __str__(oSelf):
     return cTimeDuration.fsToString(oSelf);
+  def fasGetDetails(oSelf):
+    return [oSelf.fsToString(), "%snormalized" % ("" if oSelf.fbIsNormalized() else "sign " if oSelf.fbIsSignNormalized() else "not ")];
+  def __repr__(oSelf):
+    sModuleName = ".".join(oSelf.__class__.__module__.split(".")[:-1]);
+    return "<%s.%s#%X|%s>" % (sModuleName, oSelf.__class__.__name__, id(oSelf), "|".join(oSelf.fasGetDetails()));
   
   def __lt__(oSelf, oOther):
     assert isinstance(oOther, oSelf.__class__), \

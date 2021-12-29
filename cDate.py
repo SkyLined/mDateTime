@@ -274,6 +274,11 @@ class cDate(object):
     return cDate.fsGetDateString(oSelf.__uYear, oSelf.__uMonth, oSelf.__uDay);
   def __str__(oSelf):
     return cDate.fsToString(oSelf);
+  def fasGetDetails(oSelf):
+    return [oSelf.fsToString()];
+  def __repr__(oSelf):
+    sModuleName = ".".join(oSelf.__class__.__module__.split(".")[:-1]);
+    return "<%s.%s#%X|%s>" % (sModuleName, oSelf.__class__.__name__, id(oSelf), "|".join(oSelf.fasGetDetails()));
   
   def __lt__(oSelf, oOther):
     assert isinstance(oOther, oSelf.__class__), \

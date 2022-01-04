@@ -12,10 +12,12 @@ rDate = re.compile(
   r"\s*$"
 );
 asMonths = [
+  None, # 0 is not a month
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
 asOrdinalPostfixes = [
+  None, # 0 is not a day of the month
   "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 1-10
   "th", "th", "th", "th", "th", "th", "th", "th", "th", "th", # 11-20
   "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
@@ -256,7 +258,7 @@ class cDate(object):
   def fsToHumanReadableString(oSelf):
     # Month <day>th, <year>
     return "%s %d%s, %d" % (
-      asMonths[oSelf.__uMonth - 1],
+      asMonths[oSelf.__uMonth],
       oSelf.__uDay, asOrdinalPostfixes[oSelf.__uDay],
       oSelf.__uYear,
     );

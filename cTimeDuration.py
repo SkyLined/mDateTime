@@ -226,7 +226,7 @@ class cTimeDuration(object):
     );
   
   def fnGetTotalSeconds(oSelf):
-    return ((oSelf.iHours * 60) + oSelf.iMinutes * 60) + oSelf.iSeconds + (oSelf.iMicroseconds / 1000000.0);
+    return ((oSelf.iHours * 60) + oSelf.iMinutes) * 60 + oSelf.iSeconds + (oSelf.iMicroseconds / 1000000.0);
   
   def fasToHumanReadableStrings(oSelf):
     assert cTimeDuration.fbIsSignNormalized(oSelf), \

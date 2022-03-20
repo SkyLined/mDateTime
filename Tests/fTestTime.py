@@ -46,13 +46,15 @@ def fTimePlusDurationMustEqual(sStartTime, sDuration, sExpectedHumanReadableDura
   assert sCalculatedDuration == sExpectedCalculatedDuration or sExpectedNormalizedDuration, \
       "sCalculatedDuration == %s (NOT %s)" % (sCalculatedDuration, sExpectedNormalizedDuration);
 
-def fNormalizedDurationMustEqual(sDuration, sNormalizedDuration):
+def fNormalizedDurationMustEqual(sDuration, sNormalizedDuration, nTotalInSeconds):
   oNormalizedDuration = mDateTime.cTimeDuration.foFromString(sDuration).foNormalized();
   fMustBeEqual(
     oNormalizedDuration,
     mDateTime.cTimeDuration.foFromString(sNormalizedDuration),
     "%s normalized == %s (NOT %s)" % (sDuration, oNormalizedDuration, sNormalizedDuration)
   );
+  assert oNormalizedDuration.fnGetTotalSeconds() == nTotalInSeconds, \
+      "%s in seconds == %s instead of %s" % (oNormalizedDuration, oNormalizedDuration.fnGetTotalSeconds(), nTotalInSeconds);
 
 def fTestTime():
   print("  * Testing cTime/cTimeDuration...");
@@ -74,7 +76,9 @@ def fTestTime():
                                                                       "20:01:02");
   fTimePlusDurationMustEqual("20:01:01.000001", "+24h+60m+60s+1000000u", "24 hours, 60 minutes, 60 seconds, and 1000 milliseconds", \
                                                                       "21:02:02.000001",  1, "+25h+1m+1s",  "25 hours, 1 minute, and 1 second", "+1h+1m+1s");
-  fNormalizedDurationMustEqual("1h1m1s1u", "+1h+1m+1s+1u");
-  fNormalizedDurationMustEqual("+1h+60m+3600s+3600000000u", "+4h");
+  fNormalizedDurationMustEqual("1s1u", "+1s+1u", 1.000001);
+  fNormalizedDurationMustEqual("1m1s1u", "+1m+1s+1u", 61.000001);
+  fNormalizedDurationMustEqual("1h1m1s1u", "+1h+1m+1s+1u", 3661.000001);
+  fNormalizedDurationMustEqual("+1h+60m+3600s+3600000000u", "+4h", 14400);
   
   print("    + All tests successful.");

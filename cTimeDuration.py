@@ -2,14 +2,27 @@ import math, re;
 
 gbDebugOutput = False;
 
-rTimeDuration = re.compile(
-  r"^\s*" +
-  r"(?:([+-]?\d+)\s*h(?:ours?)?\s*,?\s*)?" +
-  r"(?:([+-]?\d+)\s*m(?:inutes?)?\s*,?\s*)?" +
-  r"(?:([+-]?\d+)\s*s(?:econds?)?\s*,?\s*)?" +
-  r"(?:([+-]?\d+)\s*u(?:seconds?)?)?" +
+rTimeDuration1 = re.compile(
+  r"^\s*"
+  r"(?:" r"([+-]?\d+)\s*h(?:ours?)?\s*,?\s*"    r")?" # hours
+  r"(?:" r"([+-]?\d+)\s*m(?:inutes?)?\s*,?\s*"  r")?" # minutes
+  r"(?:" r"([+-]?\d+)\s*s(?:econds?)?\s*,?\s*"  r")?" # seconds
+  r"(?:" r"([+-]?\d+)\s*u(?:seconds?)?"         r")?" # microseconds
   r"\s*$"
 );
+rTimeDuration2 = re.compile(
+  r"^\s*" +
+  r"(?:" r"(\d+):"  r")?" # hours
+  r"(?:" r"(\d+):"  r")?" # minutes
+  r"(?:" r"(\d+)"   r")?" # seconds
+  r"(?:" r"\.(\d+)" r")?" # microsseconds
+  r"\s*$"
+);
+def foTimeDurationMatch(sDuration):
+  if isinstance(sDuration, str):
+    return rTimeDuration1.match(sDuration) or rTimeDuration2.match(sDuration);
+  return None;
+
 def fbIsValidInteger(uValue):
   return isinstance(uValue, (int, float)) and uValue % 1 == 0;
 
@@ -69,14 +82,14 @@ class cTimeDuration(object):
   
   @staticmethod
   def fbIsValidDurationString(sDuration):
-    oDurationMatch = rTimeDuration.match(sDuration) if isinstance(sDuration, str) else None;
+    oDurationMatch = foTimeDurationMatch(sDuration);
     return oDurationMatch is not None and any([sComponent is not None for sComponent in oDurationMatch.groups()]);
   @staticmethod
   def fo0FromString(sDuration):
     return None if sDuration is None else cTimeDuration.foFromString(sDuration);
   @staticmethod
   def foFromString(sDuration):
-    oDurationMatch = rTimeDuration.match(sDuration) if isinstance(sDuration, str) else None;
+    oDurationMatch = foTimeDurationMatch(sDuration);
     if oDurationMatch is None or all([sComponent is None for sComponent in oDurationMatch.groups()]):
       raise ValueError("Invalid duration string " + repr(sDuration));
     sHours, sMinutes, sSeconds, sMicroseconds = oDurationMatch.groups();

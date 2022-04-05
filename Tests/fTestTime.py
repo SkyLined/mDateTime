@@ -79,6 +79,8 @@ def fTestTime():
   fNormalizedDurationMustEqual("1s1u", "+1s+1u", 1.000001);
   fNormalizedDurationMustEqual("1m1s1u", "+1m+1s+1u", 61.000001);
   fNormalizedDurationMustEqual("1h1m1s1u", "+1h+1m+1s+1u", 3661.000001);
+  fNormalizedDurationMustEqual("1:1:1.1", "+1h+1m+1s+1u", 3661.000001);
+  fNormalizedDurationMustEqual("1:01:01.1", "+1h+1m+1s+1u", 3661.000001);
   fNormalizedDurationMustEqual("+1h+60m+3600s+3600000000u", "+4h", 14400);
   
   print("    + All tests successful.");

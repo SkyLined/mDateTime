@@ -22,19 +22,19 @@
     "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th", # 21-30
     "st"                                                        # 31
   ];
-  function fbIsValidYear($xYear) {
+  function fbIsValidYear($xYear): bool {
     return is_int($xYear);
   };
-  function fbIsValidMonth($xMonth) {
+  function fbIsValidMonth($xMonth): bool {
     return is_int($xMonth) && $xMonth >= 1 && $xMonth <= 12;
   };
-  function fbIsValidDay($xDay) {
+  function fbIsValidDay($xDay): bool {
     return is_int($xDay) && $xDay >= 1 && $xDay <= 31;
   };
-  function fbIsValidDate($uYear, $uMonth, $uDay) {
+  function fbIsValidDate($uYear, $uMonth, $uDay): bool {
     return $uDay <= fuGetLastDayInMonth0Based($uYear, $uMonth - 1);
   };
-  function fsGetDataString($uYear, $uMonth, $uDay) {
+  function fsGetDataString($uYear, $uMonth, $uDay): string {
     return (
       str_pad($uYear, 4, "0", STR_PAD_LEFT)
       . "-" . str_pad($uMonth, 2, "0", STR_PAD_LEFT)
@@ -42,7 +42,7 @@
     );
   };
   
-  function fuGetLastDayInMonth0Based($uYear, $uMonth0Based) {
+  function fuGetLastDayInMonth0Based($uYear, $uMonth0Based): int {
     $bIsLeapYear = $uYear % 4 == 0 && ($uYear % 100 != 0 || $uYear % 400 == 0);
     return $uMonth0Based == 1 ? ($bIsLeapYear ? 29 : 28) : (($uMonth0Based) % 7 % 2 ? 30 : 31); 
   };
@@ -95,14 +95,14 @@
     public static function fo0FromPHPDateTime($oDateTime) {
       return is_null($oDateTime) ? null : cDate::foFromPHPDateTime($oDateTime);
     }
-    public static function foFromPHPDateTime($oDateTime) {
+    public static function foFromPHPDateTime($oDateTime): cDate {
       return new cDate((int)$oDateTime->format("Y"), (int)$oDateTime->format("m"), (int)$oDateTime->format("d"));
     }
     
     public static function fo0FromJSON($sDate) {
       return is_null($sDate) ? null : cDate::foFromJSON($sDate);
     }
-    public static function foFromJSON($sDate) {
+    public static function foFromJSON($sDate): cDate {
       // JSON encoding uses the "string value" of cDate.
       return cDate::foFromString($sDate);
     }
@@ -110,34 +110,34 @@
     public static function fo0FromMySQL($sDate) {
       return is_null($sDate) ? null : cDate::foFromMySQL($sDate);
     }
-    public static function foFromMySQL($sDate) {
+    public static function foFromMySQL($sDate): cDate {
       // MySQL encoding uses the "string value" of cDate.
       return cDate::foFromString($sDate);
     }
     public static function fo0FromMySQLDateTime($sDateTime) {
       return is_null($sDateTime) ? null : cDate::foFromMySQLDateTime($sDateTime);
     }
-    public static function foFromMySQLDateTime($sDateTime) {
+    public static function foFromMySQLDateTime($sDateTime): cDate {
       // MySQL format is "YYYY-MM-DD hh:mm:ss", so we can just split it at the space and use the first part:
       return cDate::foFromString(explode(" ", $sDateTime)[0]);
     }
     
-    public static function fbIsValidDateString($sDate) {
+    public static function fbIsValidDateString($sDate): bool {
       return is_string($sDate) && preg_match(cDate_srDate, $sDate, $asMatch);
     }
-    public static function fo0FromString($sDate) {
+    public static function fo0FromString($sDate): cDate {
       return is_null($sDate) ? null : cDate::foFromString($sDate);
     }
-    public static function foFromString($sDate) {
+    public static function foFromString($sDate): cDate {
       if (!is_string($sDate) || !preg_match(cDate_srDate, $sDate, $asMatch)) {
         throw new Exception(json_encode($sDate) . " is not a valid date string.");
       };
       return new cDate((int)$asMatch[1], (int)$asMatch[2], (int)$asMatch[3]);
     }
-    public static function foNow() {
+    public static function foNow(): cDate {
       return cDate::foFromPHPDateTime(new DateTime());
     }
-    public static function foNowUTC() {
+    public static function foNowUTC(): cDate {
       return cDate::foFromPHPDateTime(new DateTime("now", new DateTimeZone('UTC')));
     }
     # methods
@@ -156,7 +156,7 @@
       $this->__uDay = $uDay;
     }
     
-    public function foGetEndDateForDuration($oDuration) {
+    public function foGetEndDateForDuration($oDuration): cDate {
       // Native functions exist to do this but they believe 2001-01-30 + 1m == 2001-03-02, which I personally
       // do not think is correct, so we do it manually.
       // Note that this code ignores the time (if any) in oDuration
@@ -186,7 +186,7 @@
       $oEndDate = cDate::foFromPHPDateTime($oEndPHPDateTime);
       return $oEndDate;
     }
-    public function foStartDateForDuration($oDuration) {
+    public function foStartDateForDuration($oDuration): cDate {
       $oStartPHPDateTime = $this->foToPHPDateTime();
       $oStartPHPDateTime->modify(
         (string)(-$oDuration->iYears) . " years " .
@@ -195,7 +195,7 @@
       );
       return cDate::foFromPHPDateTime($oStartPHPDateTime);
     }
-    public function foGetDurationForEndDate($oEndDate) {
+    public function foGetDurationForEndDate($oEndDate): DateDuration {
       $oStartPHPDateTime = $this->foToPHPDateTime();
       $oEndPHPDateTime = $oEndDate->foToPHPDateTime();
       $oPHPDateInterval = $oStartPHPDateTime->diff($oEndPHPDateTime);
@@ -205,7 +205,7 @@
     
     // This object has valueOf(), which returns the number of milliseconds since the epoch, so you can also
     // use ($this->valueOf() < $oDate->valueOf(), $this->valueOf() == $oDate->valueOf(), and $this->valueOf() > $oDate->valueOf())
-    public function fbIsBefore($oDate) {
+    public function fbIsBefore($oDate): bool {
       if ($this->__uYear < $oDate->uYear) return True;
       if ($this->__uYear > $oDate->uYear) return False;
       if ($this->__uMonth < $oDate->uMonth) return True;
@@ -214,10 +214,10 @@
       //if ($this->__uDay > $oDate->uDay) return False;
       return False;
     }
-    public function fbIsEqualTo($oDate) {
+    public function fbIsEqualTo($oDate): bool {
       return $this->__uYear == $oDate->uYear && $this->__uMonth == $oDate->uMonth && $this->__uDay == $oDate->uDay;
     }
-    public function fbIsAfter($oDate) {
+    public function fbIsAfter($oDate): bool {
       if ($this->__uYear > $oDate->uYear) return True;
       if ($this->__uYear < $oDate->uYear) return False;
       if ($this->__uMonth > $oDate->uMonth) return True;
@@ -227,26 +227,26 @@
       return False;
     }
     
-    public function fbIsInThePast() {
+    public function fbIsInThePast(): bool {
       return $this->fbIsBefore($this->foNow());
     }
-    public function fbIsInThePastUTC() {
+    public function fbIsInThePastUTC(): bool {
       return $this->fbIsBefore($this->foNowUTC());
     }
-    public function fbIsToday() {
+    public function fbIsToday(): bool {
       return $this->fbIsEqualTo($this->foNow());
     }
-    public function fbIsTodayUTC() {
+    public function fbIsTodayUTC(): bool {
       return $this->fbIsEqualTo($this->foNowUTC());
     }
-    public function fbIsInTheFuture() {
+    public function fbIsInTheFuture(): bool {
       return $this->fbIsAfter($this->foNow());
     }
-    public function fbIsInTheFutureUTC() {
+    public function fbIsInTheFutureUTC(): bool {
       return $this->fbIsAfter($this->foNowUTC());
     }
     
-    public function fsToHumanReadableString() {
+    public function fsToHumanReadableString(): string {
       // Month <day>th, <year>
       return (
         cDate_asMonths[$this->__uMonth - 1]
@@ -254,31 +254,31 @@
         . ", " . (string)$this->__uYear
       );
     }
-    public function foToPHPDateTime() {
+    public function foToPHPDateTime(): DateTime {
       return new DateTime($this->fsToString());
     }
-    public function foToPHPDateTimeUTC() {
+    public function foToPHPDateTimeUTC(): DateTime {
       return new DateTime($this->fsToString() + "T0:0Z");
     }
-    public function fxToJSON() {
+    public function fxToJSON(): string {
       // JSON encoding uses the "string value" of cDate.
       return $this->fsToString();
     }
-    public function fsToMySQL() {
+    public function fsToMySQL(): string {
       // MySQL encoding uses the "string value" of cDate.
       return $this->fsToString();
     }
-    public function jsonSerialize() {
+    public function jsonSerialize(): string {
       return $this->fsToString();
     }
-    public function fsToString() {
+    public function fsToString(): string {
       return (
         str_pad($this->__uYear, 4, "0", STR_PAD_LEFT)
         . "-" . str_pad($this->__uMonth, 2, "0", STR_PAD_LEFT)
         . "-" . str_pad($this->__uDay, 2, "0", STR_PAD_LEFT)
       );
     }
-    public function __toString() {
+    public function __toString(): string {
       return $this->fsToString();
     }
   };

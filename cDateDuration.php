@@ -11,7 +11,7 @@
     "(?:([+-]?\\d+)\\s*d(?:ays?)?)?" .
     "\\s*$/"
   );
-  function fbIsValidInteger($xValue) {
+  function fbIsValidInteger($xValue): bool {
     return is_int($xValue);
   };
   class cDateDuration implements JsonSerializable {
@@ -51,7 +51,7 @@
       };
     }
     // static methods
-    public static function fbIsValidDateDurationString($sDateDuration) {
+    public static function fbIsValidDateDurationString($sDateDuration): bool {
       return (
         is_string($sDateDuration)
         && preg_match(cDateDuration_srDateDuration, $sDateDuration, $asMatch)
@@ -62,14 +62,14 @@
     public static function fo0FromPHPDateInterval($oDateInterval) {
       return is_null($oDateInterval) ? null : cDateDuration::foFromPHPDateInterval($oDateInterval);
     }
-    public static function foFromPHPDateInterval($oDateInterval) {
+    public static function foFromPHPDateInterval($oDateInterval): cDateDuration {
       return new cDateDuration($oDateInterval->y, $oDateInterval->m, $oDateInterval->d);
     }
     
     public static function fo0FromJSON($sDateDuration) {
       return is_null($sDateDuration) ? null : cDate::foFromJSON($sDateDuration);
     }
-    public static function foFromJSON($sDateDuration) {
+    public static function foFromJSON($sDateDuration): cDateDuration {
       // JSON encoding uses the "string value" of cDateDuration.
       return cDateDuration::foFromString($sDateDuration);
     }
@@ -77,7 +77,7 @@
     public static function fo0FromMySQL($sDateDuration) {
       return is_null($sDateDuration) ? null : cDateDuration::foFromMySQL($sDateDuration);
     }
-    public static function foFromMySQL($sDateDuration) {
+    public static function foFromMySQL($sDateDuration): cDateDuration {
       // MySQL encoding uses the "string value" of cDateDuration.
       return cDateDuration::foFromString($sDateDuration);
     }
@@ -85,7 +85,7 @@
     public static function fo0FromString($sDateDuration) {
       return is_null($sDateDuration) ? null : cDateDuration::foFromString($sDateDuration);
     }
-    public static function foFromString($sDateDuration) {
+    public static function foFromString($sDateDuration): cDateDuration {
       if (
         !is_string($sDateDuration)
         || !preg_match(cDateDuration_srDateDuration, $sDateDuration, $asMatch)
@@ -101,7 +101,7 @@
     }
     ##
     // methods
-    public function foClone() {
+    public function foClone(): cDateDuration {
       $cClass = get_class($this);
       return new $cClass($this->__iYears, $this->__iMonths, $this->__iDays);
     }
@@ -118,41 +118,41 @@
       $this->__iDays = $iDays;
     }
     
-    public function foNormalizedForDate($oDate) {
+    public function foNormalizedForDate($oDate): cDateDuration {
       // Adjust duration to make all numbers either all positive or negative and minimze days, months and years.
       // e.g. "+2y-12m+32d" for "2000-01-01" => "+1y+1m+1d"
       return $oDate->foGetDurationForEndDate($oDate->foGetEndDateForDuration($this));
     }
     
-    public function foAdd($oOtherDateDuration) {
+    public function foAdd($oOtherDateDuration): cDateDuration {
       $this->fSet($this->__iYears + $oOtherDuration->iYears, $this->__iMonths + $oOtherDuration->iMonths, $this->__iDays + $oOtherDuration->iDays);
       return $this;
     }
-    public function foSubtract($oOtherDuration) {
+    public function foSubtract($oOtherDuration): cDateDuration {
       $this->fSet($this->__iYears - $oOtherDuration->iYears, $this->__iMonths - $oOtherDuration->iMonths, $this->__iDays - $oOtherDuration->iDays);
       return $this;
     }
-    public function foPlus($oOtherDuration) {
+    public function foPlus($oOtherDuration): cDateDuration {
       return $this->foClone().foAdd($oOtherDuration);
     }
-    public function foMinus($oOtherDuration) {
+    public function foMinus($oOtherDuration): cDateDuration {
       return $this->foClone().foSubtract($oOtherDuration);
     }
     
-    public function fbIsZero() {
+    public function fbIsZero(): bool {
       return $this->__iYears == 0 && $this->__iMonths == 0 && $this->__iDays == 0;
     }
-    public function fbIsPositive() {
+    public function fbIsPositive(): bool {
       return $this->__iYears >= 0 && $this->__iMonths >= 0 && $this->__iDays >= 0 && !$this->fbIsZero();
     }
-    public function fbIsNegative() {
+    public function fbIsNegative(): bool {
       return $this->__iYears <= 0 && $this->__iMonths <= 0 && $this->__iDays <= 0 && !$this->fbIsZero();
     }
-    public function fbIsNormalized() {
+    public function fbIsNormalized(): bool {
       return $this->fbIsZero() || $this->fbIsPositive() || $this->fbIsNegative();
     }
     
-    public function fsToHumanReadableString() {
+    public function fsToHumanReadableString(): string {
       if ($this->fbIsZero()) return "0 days";
       if (!$this->fbIsNormalized()) throw new Exception("Duration must be normalized before converting to human readable string!");
       // Show positive and negative durations the same.
@@ -169,18 +169,18 @@
       );
     }
     
-    public function fxToJSON() {
+    public function fxToJSON(): string {
       // JSON encoding uses the "string value" of cDateDuration.
       return $this->fsToString();
     }
-    public function fsToMySQL() {
+    public function fsToMySQL(): string {
       // MySQL encoding uses the "string value" of cDateDuration.
       return $this->fsToString();
     }
-    public function jsonSerialize() {
+    public function jsonSerialize(): string {
       return $this->fsToString();
     }
-    public function fsToString() {
+    public function fsToString(): string {
       if ($this->fbIsZero()) return "0d";
       // months sign is required if months are negative, or months are positive and years are negative.
       $sMonthsSign = ($this->__iMonths < 0 ? "-" : ($this->__iYears < 0 ? "+" : ""));
@@ -192,7 +192,7 @@
         $this->__iDays ? $sDaysSign . abs($this->__iDays) . "d" : "",
       ]);
     }
-    public function __toString() {
+    public function __toString(): string {
       return $this->fsToString();
     }
   };

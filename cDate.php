@@ -195,7 +195,7 @@
       );
       return cDate::foFromPHPDateTime($oStartPHPDateTime);
     }
-    public function foGetDurationForEndDate($oEndDate): DateDuration {
+    public function foGetDurationForEndDate($oEndDate): cDateDuration {
       $oStartPHPDateTime = $this->foToPHPDateTime();
       $oEndPHPDateTime = $oEndDate->foToPHPDateTime();
       $oPHPDateInterval = $oStartPHPDateTime->diff($oEndPHPDateTime);

@@ -93,7 +93,7 @@ class cDateTime(cTime, cDate):
   def foClone(oSelf):
     return cDateTime(
       oSelf.uYear, oSelf.uMonth, oSelf.uDay,
-      oSelf.uHour, oSelf.uMinute, oSelf.uSecond, oTime.uMicrosecond
+      oSelf.uHour, oSelf.uMinute, oSelf.uSecond, oSelf.uMicrosecond
     );
   
   def fSet(oSelf, uYear = None, uMonth = None, uDay = None, uHour = None, uMinute = None, uSecond = None, uMicrosecond = None):

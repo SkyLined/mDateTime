@@ -1,4 +1,4 @@
-import calendar, datetime, re, time;
+import datetime, re, time;
 
 gbDebugOutput = False;
 

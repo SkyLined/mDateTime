@@ -24,10 +24,7 @@ class cDateTime(cTime, cDate):
     return None if oDateTime is None else cDateTime.foFromPyDateTime(oDateTime);
   @staticmethod
   def foFromPyDateTime(oDateTime):
-    return cDateTime(
-      oDateTime.year, oDateTime.month, oDateTime.day,
-      oDateTime.hour, oDateTime.minute, oDateTime.second, oDateTime.microsecond
-    );
+    return cDateTime.foFromTimestamp(oDateTime.timestamp());
   
   @staticmethod
   def fo0FromJSON(s0DateTime):

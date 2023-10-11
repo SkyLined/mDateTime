@@ -5,7 +5,7 @@ gbDebugOutput = False;
 from .cDate import cDate;
 from .cTime import cTime;
 
-rISO8601UTCDateTime = re.compile("^\s*(\d{4})\-?(\d\d)-?(\d\d)T(\d\d):?(\d\d):?(\d\d)(\.\d+)?(?:Z|\+00:00)\s*$", re.I);
+rISO8601UTCDateTime = re.compile(r"^\s*(\d{4})\-?(\d\d)-?(\d\d)T(\d\d):?(\d\d):?(\d\d)(\.\d+)?(?:Z|\+00:00)\s*$", re.I);
 
 class cDateTime(cTime, cDate):
   # Static methods
